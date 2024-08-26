@@ -1,0 +1,3 @@
+from .main_handlers import register_main_handlers
+from .weather_handlers import register_weather_handlers
+from .other_handlers import register_other_handlers
