@@ -1,0 +1,10 @@
+asyncio==3.4.3
+aiogram==2.25.1
+
+pydantic==2.8.2
+pydantic_settings==2.4.0
+
+SQLAlchemy==2.0.31
+asyncpg==0.29.0
+
+loguru==0.7.2
