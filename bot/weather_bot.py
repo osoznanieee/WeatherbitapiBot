@@ -25,6 +25,12 @@ async def on_startup(_):
     if args.action:
         await handlers.main_handlers.db.table(action=args.action)
 
+        # Чтение SQL-запросов из файла
+
+        with open(fr'{__file__}\..\add_city_names.sql', 'r', encoding='UTF-8') as file:
+            sql_commands = file.read().split(';')
+
+        await handlers.main_handlers.db.insert_city_names(sql_commands=sql_commands)
 
 if __name__ == '__main__':
     # регистрируем хендлеры

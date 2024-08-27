@@ -3,7 +3,7 @@ from typing import (
 )
 
 from sqlalchemy import (
-    MetaData, select, update
+    MetaData, select, update, text
 )
 
 from sqlalchemy.orm import selectinload
@@ -200,3 +200,12 @@ class Database:
             else:
                 logger.info(f'update forecast_today for {city}')
                 return None if not user else user
+
+    async def insert_city_names(self, sql_commands: str):
+        async with self.async_engine.begin() as connection:  # Открываем транзакцию
+            for command in sql_commands:
+                if command.strip():
+                    await connection.execute(text(command))
+            await connection.commit()
+
+        logger.info('cities inserted successfully!')
