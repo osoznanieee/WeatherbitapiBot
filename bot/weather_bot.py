@@ -1,5 +1,4 @@
 import argparse
-import os
 import sys
 
 from aiogram import executor
@@ -35,11 +34,10 @@ if __name__ == '__main__':
 
     # Логирование в файл с ротацией и сжатием
     logger.add(
-        sink=fr'{os.getcwd()}\..\logs\debug.log',
+        sink=fr'{__file__}\..\..\logs\debug.log',
         format=lambda msg: f"{msg['file'].path} - {msg['message']} - {msg['time'].strftime('%Y-%m-%d - %H:%M')}\n",
         level="INFO",
         compression='zip',
-        rotation='1MB',
-        enqueue=True)
+        rotation='1MB')
 
     executor.start_polling(dp, skip_updates=True, on_startup=on_startup, on_shutdown=on_shutdown)
