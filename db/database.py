@@ -71,7 +71,7 @@ class Database:
 
     async def insert_user(self,
                           user_id: int,
-                          city: str) -> Optional[True]:
+                          city: str) -> Optional[int]:
         """Вставка пользователя в таблицу"""
         async with self.async_session() as session:
             user = UsersORM(id=user_id, city=city)
@@ -87,7 +87,7 @@ class Database:
                 raise exc
             else:
                 logger.info(f'insert user on table. user_id: {user_id}, city: {city}')
-                return True
+                return 1
 
     async def get_city_by_user_id(self,
                                   user_id: int
@@ -202,6 +202,7 @@ class Database:
                 return None if not user else user
 
     async def insert_city_names(self, sql_commands: str):
+        """Срабатывает при флаге -a и create"""
         async with self.async_engine.begin() as connection:  # Открываем транзакцию
             for command in sql_commands:
                 if command.strip():

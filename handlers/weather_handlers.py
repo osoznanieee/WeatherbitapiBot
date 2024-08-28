@@ -25,7 +25,7 @@ async def get_3_day_forecast(callback_query: types.CallbackQuery):
     user: Optional[CitiesScheme] = await db.get_user_info(callback_query.from_user.id)
 
     if not user:
-        await callback_query.answer('Вы не выбрали город!')
+        await callback_query.answer('Вы не выбрали город!', show_alert=True)
     else:
         is_updated_today = user.update_on.strftime("%Y-%m-%d") == datetime.datetime.now().strftime("%Y-%m-%d")
 
@@ -144,7 +144,7 @@ async def get_today_forecast(callback_query: types.CallbackQuery):
     user: Optional[CitiesScheme] = await db.get_user_info(callback_query.from_user.id)
 
     if not user:
-        await callback_query.answer('Вы не выбрали город!')
+        await callback_query.answer('Вы не выбрали город!', show_alert=True)
     else:
         is_updated_today = user.update_on.strftime("%Y-%m-%d") == datetime.datetime.now().strftime("%Y-%m-%d")
 

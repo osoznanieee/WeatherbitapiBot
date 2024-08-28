@@ -2,9 +2,8 @@ from aiogram import types
 from aiogram.utils.exceptions import MessageNotModified
 
 from bot import (
-    bot, Dispatcher
+    bot, Dispatcher, InlineKeyboards
 )
-from bot import InlineKeyboards
 
 
 async def other(callback_query: types.CallbackQuery):
