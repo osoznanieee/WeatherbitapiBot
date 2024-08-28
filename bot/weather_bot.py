@@ -1,5 +1,6 @@
 import argparse
 import sys
+import os
 
 from aiogram import executor
 from loguru import logger
@@ -21,13 +22,11 @@ async def on_startup(_):
     parser.add_argument('-a', '--action', type=str, help="создает таблицы")
 
     args = parser.parse_args()
-
     if args.action:
         await handlers.main_handlers.db.table(action=args.action)
 
         # Чтение SQL-запросов из файла
-
-        with open(fr'{__file__}\..\add_city_names.sql', 'r', encoding='UTF-8') as file:
+        with open(os.path.normpath(fr'{__file__}\..\add_city_names.sql'.replace('\\', '/')), 'r', encoding='UTF-8') as file:
             sql_commands = file.read().split(';')
 
         await handlers.main_handlers.db.insert_city_names(sql_commands=sql_commands)
@@ -40,7 +39,7 @@ if __name__ == '__main__':
 
     # Логирование в файл с ротацией и сжатием
     logger.add(
-        sink=fr'{__file__}\..\..\logs\debug.log',
+        sink=os.path.normpath(fr'{__file__}\..\..\logs\debug.log'.replace('\\', '/')),
         format=lambda msg: f"{msg['file'].path} - {msg['message']} - {msg['time'].strftime('%Y-%m-%d - %H:%M')}\n",
         level="INFO",
         compression='zip',
