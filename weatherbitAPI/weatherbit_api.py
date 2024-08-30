@@ -66,13 +66,9 @@ class WeatherAPI:
         :return: возвращает json с информацией за текущий день
         """
         async with aiohttp.ClientSession() as session:
-            time_now: datetime = datetime.now()
-
-            time_plus = 24 - time_now.hour + 2
 
             async with session.get(url=self.api_url + 'current', params={
                 'key': self.api_key,
-                'hours': time_plus,
                 'lang': 'ru',
                 'city': city
             }
@@ -96,7 +92,7 @@ class WeatherHandler:
     ]
 
     @staticmethod
-    def parse_json_forecasts(json: str) -> __forecasts3days:
+    def parse_json_forecasts_for_3_days(json: str) -> __forecasts3days:
         """
         :param json: исходный json
         :return: возвращает кортеж в котором 3 списка (в каждом списке по 24 объекта WeatherSchemeData
@@ -192,7 +188,7 @@ class WeatherHandler:
             return data
 
     @staticmethod
-    def parse_json_for_today(json: str) -> WeatherSchemeDataToday:
+    def parse_json_forecasts_for_today(json: str) -> WeatherSchemeDataToday:
         """
         Вызывать после get_weather_for_today
 

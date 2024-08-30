@@ -53,7 +53,7 @@ async def get_3_day_forecast(callback_query: types.CallbackQuery):
                 await callback_query.answer('Вы уже нажали на кнопку')
 
             forecast_json = await api.get_3_day_forecasts(city=user.city)
-            parsed_json = handler.parse_json_forecasts(forecast_json)
+            parsed_json = handler.parse_json_forecasts_for_3_days(forecast_json)
 
             weather: list[list[WeatherSchemeData]] = handler.get_3_days_forecast(parsed_json).data
             text = ''
@@ -146,7 +146,7 @@ async def get_today_forecast(callback_query: types.CallbackQuery):
     if not user:
         await callback_query.answer('Вы не выбрали город!', show_alert=True)
     else:
-        is_updated_today = user.update_on.strftime("%Y-%m-%d") == datetime.datetime.now().strftime("%Y-%m-%d")
+        is_updated_today = user.update_on.strftime("%Y-%m-%d-%H") == datetime.datetime.now().strftime("%Y-%m-%d-%H")
 
         if is_updated_today and user.weather_info_today:
             try:
@@ -176,7 +176,7 @@ async def get_today_forecast(callback_query: types.CallbackQuery):
                 try:
                     json = await api.get_weather_for_today(city=user.city)
 
-                    data: WeatherSchemeDataToday = handler.parse_json_for_today(json)
+                    data: WeatherSchemeDataToday = handler.parse_json_forecasts_for_today(json)
 
                     text = f"""
 <i><b>Дата - {data.datetime}</b></i> 📆
