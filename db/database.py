@@ -159,7 +159,7 @@ class Database:
                 return city
 
     async def update_weather_info_forecast_by_city(self, city: str,
-                                                   new_weather_info_forecasts: str | None
+                                                   new_weather_info_forecasts: str
                                                    ) -> Optional[int]:
         """Обновить прогнозы на 3 дня по городу"""
         async with self.async_session() as session:
@@ -181,7 +181,7 @@ class Database:
                 return None if not user else user
 
     async def update_weather_info_today_by_city(self, city: str,
-                                                new_weather_info_today: str | None
+                                                new_weather_info_today: str
                                                 ) -> Optional[int]:
         """Обновить прогнозы на сегодня по городу"""
         async with self.async_session() as session:
@@ -189,6 +189,29 @@ class Database:
                 update(CitiesORM).
                 values(weather_info_today=new_weather_info_today,
                        today_update_on=datetime.now()).
+                where(CitiesORM.city == city).
+                execution_options(synchronize_session="fetch")
+            )
+
+            try:
+                user = (await session.execute(stmt)).rowcount
+                await session.commit()
+            except Exception as exc:
+                logger.critical(f'ERROR! something went wrong with the weather_frcst_td update!: {exc}')
+                raise exc
+            else:
+                logger.info(f'update forecast_today for {city}')
+                return None if not user else user
+
+    async def update_air_quality_info_today_by_city(self, city: str,
+                                                    new_air_quality_info_today: str
+                                                    ) -> Optional[int]:
+        """Обновить прогнозы на сегодня по городу"""
+        async with self.async_session() as session:
+            stmt = (
+                update(CitiesORM).
+                values(air_quality_today=new_air_quality_info_today,
+                       air_quality_update_on=datetime.now()).
                 where(CitiesORM.city == city).
                 execution_options(synchronize_session="fetch")
             )

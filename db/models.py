@@ -28,8 +28,10 @@ class CitiesORM(Base):
     city: Mapped[str] = mapped_column(primary_key=True)
     weather_info_today: Mapped[str | None] = mapped_column(Text)
     weather_forecast_for_3_days: Mapped[str | None] = mapped_column(Text)
+    air_quality_today: Mapped[str | None] = mapped_column(Text)
 
     today_update_on: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     days_3_update_on: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    air_quality_update_on: Mapped[datetime] = mapped_column(DateTime, nullable=False)
 
     users: Mapped[UsersORM] = relationship(back_populates="city_info")

@@ -1,6 +1,10 @@
+from typing import Literal
+
 from pydantic import (
-    BaseModel, Field
+    BaseModel, Field, conint
 )
+
+PollenLevelType = conint(ge=0, le=4)
 
 
 class ConfigMixin(BaseModel):
@@ -62,3 +66,36 @@ class WeatherScheme(ConfigMixin):
     3) парсит прогноз на сегодня (в data приходит список из 1 элемента WeatherSchemeToday)
     """
     data: list[WeatherSchemeData] | list[list[WeatherSchemeData]] | list[WeatherSchemeDataToday]
+
+
+class AirQualityScheme(ConfigMixin):
+    """
+    Модель для прогноза качества воздуха на сегодня
+    """
+
+    aqi: int = Field(description='Индекс качества воздуха [США - стандарт EPA 0 - +500]')
+
+    o3: int | float = Field(description='Концентрация озона (O3) на поверхности (µг/м³)')
+    so2: int | float = Field(description='Концентрация диоксида серы (SO2) на поверхности (µг/м³)')
+    no2: int | float = Field(description='Концентрация диоксида азота (NO2) на поверхности (µг/м³)')
+    co: int | float = Field(description='Концентрация монооксида углерода (CO) (µг/м³)')
+
+    pollen_level_tree: PollenLevelType = Field(description=(
+                                                'Уровень пыльцы деревьев (0 = Нет, 1 = Низкий, 2 = Умеренный, '
+                                                '3 = Высокий, 4 = Очень высокий)'))
+
+    pollen_level_grass: PollenLevelType = Field(description=(
+                                                'Уровень пыльцы трав (0 = Нет, 1 = Низкий, 2 = Умеренный, '
+                                                '3 = Высокий, 4 = Очень высокий)'))
+
+    pollen_level_weed: PollenLevelType = Field(description=(
+                                                'Уровень пыльцы сорняков (0 = Нет, 1 = Низкий, 2 = Умеренный, '
+                                                '3 = Высокий, 4 = Очень высокий)'))
+
+    mold_level: PollenLevelType = Field(description=(
+                                                'Уровень плесени (0 = Нет, 1 = Низкий, 2 = Умеренный, '
+                                                '3 = Высокий, 4 = Очень высокий)'))
+
+    predominant_pollen_type: Literal[
+        'Trees', 'Weeds', 'Molds', 'Grasses'
+    ] = Field(description='Преобладающий тип пыльцы')

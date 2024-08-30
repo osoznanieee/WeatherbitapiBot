@@ -3,7 +3,7 @@ from datetime import datetime
 from loguru import logger
 
 from .schemas import (
-    WeatherSchemeData, WeatherSchemeDataData, WeatherScheme, WeatherSchemeDataToday
+    WeatherSchemeData, WeatherSchemeDataData, WeatherScheme, WeatherSchemeDataToday, AirQualityScheme
 )
 
 from .config import config_api
@@ -59,7 +59,7 @@ class WeatherAPI:
 
     async def get_weather_for_today(self, city: str) -> str:
         """
-        Делает запрос прогноза на текущий день
+        Делает запрос прогноза на текущий час
 
 
         :param city: Город по которому нужно получить прогнозы
@@ -82,9 +82,29 @@ class WeatherAPI:
                     logger.critical(f'ERROR: unsuccessful request for today forecasts: {response.text()}')
                     raise ValueError(f'Что-то пошло не так: {response.text()}')
 
+    async def get_air_quality_for_today(self, city: str) -> str:
+        """
+        Делает запрос прогноза качества воздуха на текущее время
+
+        :param city: Город по которому нужно получить прогнозы качества воздуха
+        :return: возвращает json с информацией качества воздуха за текущий день
+        """
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url=self.api_url + 'current/airquality', params={
+                'key': self.api_key,
+                'city': city
+            }
+                                   ) as response:
+                if response.status == 200:
+                    response = await response.text()
+                    logger.info(f'successful forecasts for today air quality request for {city}')
+                    return response[response.find("[") + 1:response.find("]")]
+                else:
+                    logger.critical(f'ERROR: unsuccessful request for today air quality forecasts: {response.text()}')
+                    raise ValueError(f'Что-то пошло не так: {response.text()}')
+
 
 class WeatherHandler:
-
     __forecasts3days = tuple[
         list[WeatherSchemeData],
         list[WeatherSchemeData],
@@ -203,3 +223,20 @@ class WeatherHandler:
         else:
             logger.info('successful parse')
             return obj[0]
+
+    @staticmethod
+    def parse_json_air_quality_forecast_for_today(json: str) -> AirQualityScheme:
+        """
+        Вызывать после get_air_quality_for_today
+
+        :param json: исходный json
+        :return: возвращает AirQualityScheme
+        """
+        try:
+            obj: AirQualityScheme = AirQualityScheme.parse_raw(json)
+        except Exception as exc:
+            logger.critical(f'ERROR: unsuccessful parse json for today air quality forecasts: {exc}')
+            raise exc
+        else:
+            logger.info('successful parse')
+            return obj

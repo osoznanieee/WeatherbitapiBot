@@ -14,6 +14,7 @@ class InlineKeyboards:
                  InlineKeyboardButton(text='Выбрать город 🗺️', callback_data='change_city')],
                 [InlineKeyboardButton(text='Прогноз каждый час 🌥️', callback_data='forecast_for_today')],
                 [InlineKeyboardButton(text='Прогноз на след. 3 дня 🌥️', callback_data='3_day_forecast')],
+                [InlineKeyboardButton(text='Качество воздуха на сегодня 🌬️', callback_data='air_quality')],
                 [InlineKeyboardButton(text='Другое', callback_data='other')]
             ], row_width=2)
         return kb

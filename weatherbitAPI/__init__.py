@@ -3,7 +3,7 @@ from .weatherbit_api import (
 )
 
 from .schemas import (
-    WeatherSchemeData, WeatherSchemeDataToday
+    WeatherSchemeData, WeatherSchemeDataToday, AirQualityScheme
 )
 
 from .config import config_api

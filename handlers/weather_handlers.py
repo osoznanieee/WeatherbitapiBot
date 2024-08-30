@@ -10,7 +10,7 @@ from bot import (
 from db import Database, CitiesScheme
 
 from weatherbitAPI import (
-    WeatherAPI, WeatherHandler, WeatherSchemeData, WeatherSchemeDataToday
+    WeatherAPI, WeatherHandler, WeatherSchemeData, WeatherSchemeDataToday, AirQualityScheme
 )
 
 from typing import Optional
@@ -219,6 +219,92 @@ async def get_today_forecast(callback_query: types.CallbackQuery):
                     )
 
 
+async def get_today_air_quality_forecast(callback_query: types.CallbackQuery):
+    user: Optional[CitiesScheme] = await db.get_user_info(callback_query.from_user.id)
+
+    if not user:
+        await callback_query.answer('Вы не выбрали город!', show_alert=True)
+    else:
+        is_updated_now = user.air_quality_update_on.strftime("%Y-%m-%d") == datetime.datetime.now().strftime("%Y-%m-%d")
+
+        if is_updated_now and user.weather_info_today:
+            try:
+                await bot.edit_message_text(
+                    chat_id=callback_query.message.chat.id,
+                    message_id=callback_query.message.message_id,
+                    text=user.air_quality_today,
+                    reply_markup=InlineKeyboards.transition_to_main_keyboard(),
+                    parse_mode='HTML'
+                )
+            except MessageNotModified:
+                await callback_query.answer('Вы уже нажали на кнопку')
+
+        else:
+            try:
+                await bot.edit_message_text(
+                    chat_id=callback_query.message.chat.id,
+                    message_id=callback_query.message.message_id,
+                    text="Ожидайте... 🔎",
+                    reply_markup=InlineKeyboards.transition_to_main_keyboard(),
+                )
+
+            except MessageNotModified:
+                await callback_query.answer('Вы уже нажали на кнопку')
+
+            else:
+                try:
+                    json = await api.get_air_quality_for_today(city=user.city)
+
+                    data: AirQualityScheme = handler.parse_json_air_quality_forecast_for_today(json)
+                    levels = {0: 'Нет', 1: 'Низкий', 2: 'Умеренный', 3: 'Высокий', 4: 'Очень высокий'}
+
+                    predominant_pollens = {
+                        'Trees': 'Пыльца от цветения деревьев 🌳',
+                        'Weeds': 'Пыльца от цветения различных видов сорняков 🌾',
+                        'Molds': 'Споры плесени 🦠',
+                        'Grasses': 'Пыльца от цветения трав 🌿'
+                    }
+
+                    text = f"""
+<i><b>Дата - {datetime.datetime.now().strftime("%Y-%m-%d")}</b></i> 🕒
+
+Индекс качества воздуха: {data.aqi} 🌬️
+
+
+<b>Концентрация озона</b> (O3) на поверхности - {round(data.o3, 1)} (µг/м³) 🌫️
+
+<b>Концентрация диоксида серы</b> (SO2) на поверхности - {round(data.so2, 1)} (µг/м³) 🏭
+
+<b>Концентрация диоксида азота</b> (NO2) на поверхности - {round(data.no2, 1)} (µг/м³) 🚗
+
+<b>Концентрация угарного газа (CO)</b> - {round(data.co, 1)} (µг/м³) 🔥
+
+
+<b>Уровень пыльцы деревьев - {levels[data.pollen_level_tree]}</b> 🌳
+<b>Уровень пыльцы трав - {levels[data.pollen_level_grass]}</b> 🌿
+<b>Уровень пыльцы сорняков - {levels[data.pollen_level_weed]}</b> 🌾
+<b>Уровень плесени - {levels[data.mold_level]}</b> 🦠
+
+
+<i>Преобладающий тип пыльцы</i> - {predominant_pollens[data.predominant_pollen_type]}
+"""
+                    await bot.edit_message_text(
+                        chat_id=callback_query.message.chat.id,
+                        message_id=callback_query.message.message_id,
+                        text=text,
+                        reply_markup=InlineKeyboards.transition_to_main_keyboard(),
+                        parse_mode='HTML'
+                    )
+                except MessageNotModified:
+                    await callback_query.answer('Что-то пошло не так!')
+                else:
+                    await db.update_air_quality_info_today_by_city(
+                        city=user.city,
+                        new_air_quality_info_today=text
+                    )
+
+
 def register_weather_handlers(dispatcher: Dispatcher):
     dispatcher.register_callback_query_handler(get_3_day_forecast, lambda cb: cb.data == '3_day_forecast')
     dispatcher.register_callback_query_handler(get_today_forecast, lambda cb: cb.data == 'forecast_for_today')
+    dispatcher.register_callback_query_handler(get_today_air_quality_forecast, lambda cb: cb.data == 'air_quality')
