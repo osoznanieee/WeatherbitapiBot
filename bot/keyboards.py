@@ -12,7 +12,7 @@ class InlineKeyboards:
             inline_keyboard=[
                 [InlineKeyboardButton(text='Профиль ⚙️', callback_data='profile'),
                  InlineKeyboardButton(text='Выбрать город 🗺️', callback_data='change_city')],
-                [InlineKeyboardButton(text='Прогноз сейчас 🌥️', callback_data='forecast_for_today')],
+                [InlineKeyboardButton(text='Прогноз каждый час 🌥️', callback_data='forecast_for_today')],
                 [InlineKeyboardButton(text='Прогноз на след. 3 дня 🌥️', callback_data='3_day_forecast')],
                 [InlineKeyboardButton(text='Другое', callback_data='other')]
             ], row_width=2)

@@ -9,7 +9,8 @@ class CitiesScheme(BaseModel):
     weather_info_today: str | None
     weather_forecast_for_3_days: str | None
 
-    update_on: datetime
+    today_update_on: datetime
+    days_3_update_on: datetime
 
     class Config:
         """Конфигурация модели Pydantic"""

@@ -1,5 +1,5 @@
 from sqlalchemy import (
-    Text, String, DateTime, ForeignKey, func, BigInteger
+    Text, String, DateTime, ForeignKey, BigInteger
 )
 
 from sqlalchemy.orm import (
@@ -29,6 +29,7 @@ class CitiesORM(Base):
     weather_info_today: Mapped[str | None] = mapped_column(Text)
     weather_forecast_for_3_days: Mapped[str | None] = mapped_column(Text)
 
-    update_on: Mapped[datetime] = mapped_column(DateTime, nullable=False, onupdate=func.now())
+    today_update_on: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    days_3_update_on: Mapped[datetime] = mapped_column(DateTime, nullable=False)
 
     users: Mapped[UsersORM] = relationship(back_populates="city_info")

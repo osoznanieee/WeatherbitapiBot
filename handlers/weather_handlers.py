@@ -27,7 +27,7 @@ async def get_3_day_forecast(callback_query: types.CallbackQuery):
     if not user:
         await callback_query.answer('Вы не выбрали город!', show_alert=True)
     else:
-        is_updated_today = user.update_on.strftime("%Y-%m-%d") == datetime.datetime.now().strftime("%Y-%m-%d")
+        is_updated_today = user.days_3_update_on.strftime("%Y-%m-%d") == datetime.datetime.now().strftime("%Y-%m-%d")
 
         if is_updated_today and user.weather_forecast_for_3_days:
             try:
@@ -146,9 +146,9 @@ async def get_today_forecast(callback_query: types.CallbackQuery):
     if not user:
         await callback_query.answer('Вы не выбрали город!', show_alert=True)
     else:
-        is_updated_today = user.update_on.strftime("%Y-%m-%d-%H") == datetime.datetime.now().strftime("%Y-%m-%d-%H")
+        is_updated_now = user.today_update_on.strftime("%Y-%m-%d-%H") == datetime.datetime.now().strftime("%Y-%m-%d-%H")
 
-        if is_updated_today and user.weather_info_today:
+        if is_updated_now and user.weather_info_today:
             try:
                 await bot.edit_message_text(
                     chat_id=callback_query.message.chat.id,
@@ -178,8 +178,9 @@ async def get_today_forecast(callback_query: types.CallbackQuery):
 
                     data: WeatherSchemeDataToday = handler.parse_json_forecasts_for_today(json)
 
+                    hour = datetime.datetime.now().hour
                     text = f"""
-<i><b>Дата - {data.datetime}</b></i> 📆
+<i><b>Дата - {data.datetime[:data.datetime.find(':')]}  {hour} часов</b></i> 📆
 
 Время восхода солнца - {data.sunrise} (UTC +3:00) 🌇
 Время заката - {data.sunset} (UTC +3:00) 🏙

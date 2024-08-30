@@ -18,7 +18,7 @@ from sqlalchemy.exc import (
     IntegrityError, ProgrammingError
 )
 
-from .schemas import CitiesScheme
+from .schemas import CitiesScheme, datetime
 
 from .models import (
     Base, CitiesORM, UsersORM
@@ -165,7 +165,8 @@ class Database:
         async with self.async_session() as session:
             stmt = (
                 update(CitiesORM).
-                values(weather_forecast_for_3_days=new_weather_info_forecasts).
+                values(weather_forecast_for_3_days=new_weather_info_forecasts,
+                       days_3_update_on=datetime.now()).
                 where(CitiesORM.city == city).
                 execution_options(synchronize_session="fetch")
             )
@@ -186,7 +187,8 @@ class Database:
         async with self.async_session() as session:
             stmt = (
                 update(CitiesORM).
-                values(weather_info_today=new_weather_info_today).
+                values(weather_info_today=new_weather_info_today,
+                       today_update_on=datetime.now()).
                 where(CitiesORM.city == city).
                 execution_options(synchronize_session="fetch")
             )
