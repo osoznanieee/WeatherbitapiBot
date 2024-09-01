@@ -32,7 +32,7 @@ class WeatherAPI:
 
             str_time_now = (f'{time_now.year}-'
                             f'{time_now.month if len(str(time_now.month)) == 2 else f"0{time_now.month}"}-'
-                            f'{time_now.day}:{23}')
+                            f'{time_now.day if len(str(time_now.day)) == 2 else f"0{time_now.day}"}:23')
 
             async with session.get(url=self.api_url + 'forecast/hourly', params={
                 'key': self.api_key,
