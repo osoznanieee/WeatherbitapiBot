@@ -79,7 +79,7 @@ async def get_3_day_forecast(callback_query: types.CallbackQuery):
 Давление - {round(day[0].pres * 0.75006)} мм рт. ст.
 Относительная влажность воздуха - {day[0].rh}%
 Облачность - {day[0].clouds}% ☁️
-УФ-индекс - {day[0].uv} (0 - +11)
+УФ-индекс - {day[0].uv}
 <b>Статус погоды: 
 {lst[0][0][0]} - {round(lst[0][0][1] * (100 / 6))}%
 {f'{lst[0][1][0]} - {round(lst[0][1][1] * (100 / 6))}%' if len(lst[0]) > 1 else ' '}</b>
@@ -92,7 +92,7 @@ async def get_3_day_forecast(callback_query: types.CallbackQuery):
 Давление - {round(day[1].pres * 0.75006)} мм рт. ст.
 Относительная влажность воздуха - {day[1].rh}%
 Облачность - {day[1].clouds}% ☁️
-УФ-индекс - {day[1].uv} (0 - +11)
+УФ-индекс - {day[1].uv}
 <b>Статус погоды: 
 {lst[1][0][0]} - {round(lst[1][0][1] * (100 / 6))}%
 {f'{lst[1][1][0]} - {round(lst[1][1][1] * (100 / 6))}%' if len(lst[1]) > 1 else ' '}</b>
@@ -105,7 +105,7 @@ async def get_3_day_forecast(callback_query: types.CallbackQuery):
 Давление - {round(day[2].pres * 0.75006)} мм рт. ст.
 Относительная влажность воздуха - {day[2].rh}%
 Облачность - {day[2].clouds}% ☁️
-УФ-индекс - {day[2].uv} (0 - +11)
+УФ-индекс - {day[2].uv}
 <b>Статус погоды: 
 {lst[2][0][0]} - {round(lst[2][0][1] * (100 / 6))}%
 {f'{lst[2][1][0]} - {round(lst[2][1][1] * (100 / 6))}%' if len(lst[2]) > 1 else ' '}</b>
@@ -118,7 +118,7 @@ async def get_3_day_forecast(callback_query: types.CallbackQuery):
 Давление - {round(day[3].pres * 0.75006)} мм рт. ст.
 Относительная влажность воздуха - {day[3].rh}%
 Облачность - {day[3].clouds}% ☁️
-УФ-индекс - {day[3].uv} (0 - +11)
+УФ-индекс - {day[3].uv}
 <b>Статус погоды: 
 {lst[3][0][0]} - {round(lst[3][0][1] * (100 / 6))}%
 {f'{lst[3][1][0]} - {round(lst[3][1][1] * (100 / 6))}%' if len(lst[3]) > 1 else ''}</b>"""
@@ -178,9 +178,8 @@ async def get_today_forecast(callback_query: types.CallbackQuery):
 
                     data: WeatherSchemeDataToday = handler.parse_json_forecasts_for_today(json)
 
-                    hour = datetime.datetime.now().hour
                     text = f"""
-<i><b>Дата - {data.datetime[:data.datetime.find(':')]}  {hour} часов</b></i> 📆
+<i><b>Дата - {datetime.datetime.now().strftime("%Y-%m-%d  %H")} часов</b></i> 📆
 
 Время восхода солнца - {data.sunrise} (UTC +3:00) 🌇
 Время заката - {data.sunset} (UTC +3:00) 🏙
@@ -197,8 +196,8 @@ async def get_today_forecast(callback_query: types.CallbackQuery):
 Относительная влажность воздуха - {data.rh} % 💧
 Облачность - {data.clouds} % ☁️
 Видимость - {data.vis} км 👁
-УФ-индекс - {data.uv} (0 - +11)
-Индекс качества воздуха - {data.aqi} (0 - +500)
+УФ-индекс - {data.uv}
+Индекс качества воздуха - {data.aqi}
 
 
 <b>Статус: {data.weather.description}</b>"""

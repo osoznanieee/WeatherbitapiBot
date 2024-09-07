@@ -220,10 +220,10 @@ class Database:
                 user = (await session.execute(stmt)).rowcount
                 await session.commit()
             except Exception as exc:
-                logger.critical(f'ERROR! something went wrong with the weather_frcst_td update!: {exc}')
+                logger.critical(f'ERROR! something went wrong with the air_quality_frcst_td update!: {exc}')
                 raise exc
             else:
-                logger.info(f'update forecast_today for {city}')
+                logger.info(f'update air_quality_forecast_today for {city}')
                 return None if not user else user
 
     async def insert_city_names(self, sql_commands: str):

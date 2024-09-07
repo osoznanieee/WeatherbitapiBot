@@ -13,9 +13,8 @@ class Config(BaseSettings):
 
     TOKEN: str
 
-    model_config = SettingsConfigDict(env_file=os.path.normpath(fr'{__file__}\..\.env'.replace('\\', '/')))  # используется для
-    # конфигурации модели настроек
-
+    model_config = SettingsConfigDict(env_file=os.path.normpath(fr'{__file__}\..\.env'.replace('\\', '/')))
+    # используется для конфигурации модели настроек
     # __file__ - путь к текущему файлу
 
 config = Config()

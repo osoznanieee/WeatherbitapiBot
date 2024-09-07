@@ -40,10 +40,10 @@ class WeatherAPI:
                 'lang': 'ru',
                 'city': city
             }
-                                   ) as response:
+                                   ) as res:
+                response = await res.text()
 
-                if response.status == 200:
-                    response = await response.text()
+                if res.status == 200:
 
                     input_json = response[response.find(str_time_now):]
 
@@ -54,8 +54,8 @@ class WeatherAPI:
                     return out_json
 
                 else:
-                    logger.critical(f'ERROR: unsuccessful request for forecasts3days: {response.text()}')
-                    raise ValueError(f'Что-то пошло не так: {response.text()}')
+                    logger.critical(f'ERROR: unsuccessful request for forecasts3days: {response}')
+                    raise ValueError(f'Что-то пошло не так: {response}')
 
     async def get_weather_for_today(self, city: str) -> str:
         """
@@ -72,15 +72,15 @@ class WeatherAPI:
                 'lang': 'ru',
                 'city': city
             }
-                                   ) as response:
+                                   ) as res:
+                response = await res.text()
 
-                if response.status == 200:
-                    response = await response.text()
+                if res.status == 200:
                     logger.info(f'successful forecasts for today request for {city}')
                     return "{" + response[response.find("data") - 1:]
                 else:
-                    logger.critical(f'ERROR: unsuccessful request for today forecasts: {response.text()}')
-                    raise ValueError(f'Что-то пошло не так: {response.text()}')
+                    logger.critical(f'ERROR: unsuccessful request for today forecasts: {response}')
+                    raise ValueError(f'Что-то пошло не так: {response}')
 
     async def get_air_quality_for_today(self, city: str) -> str:
         """
@@ -94,14 +94,15 @@ class WeatherAPI:
                 'key': self.api_key,
                 'city': city
             }
-                                   ) as response:
-                if response.status == 200:
-                    response = await response.text()
+                                   ) as res:
+                response = await res.text()
+
+                if res.status == 200:
                     logger.info(f'successful forecasts for today air quality request for {city}')
                     return response[response.find("[") + 1:response.find("]")]
                 else:
-                    logger.critical(f'ERROR: unsuccessful request for today air quality forecasts: {response.text()}')
-                    raise ValueError(f'Что-то пошло не так: {response.text()}')
+                    logger.critical(f'ERROR: unsuccessful request for today air quality forecasts: {response}')
+                    raise ValueError(f'Что-то пошло не так: {response}')
 
 
 class WeatherHandler:

@@ -1,5 +1,5 @@
 from sqlalchemy import (
-    Text, String, DateTime, ForeignKey, BigInteger
+    ForeignKey, BigInteger
 )
 
 from sqlalchemy.orm import (
@@ -16,8 +16,8 @@ class Base(DeclarativeBase):
 class UsersORM(Base):
     __tablename__ = 'users'
 
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, nullable=False, autoincrement=False)
-    city: Mapped[str] = mapped_column(String, ForeignKey('cities.city'), nullable=False)
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=False)
+    city: Mapped[str] = mapped_column(ForeignKey('cities.city'))
 
     city_info: Mapped["CitiesORM"] = relationship(back_populates="users")
 
@@ -26,12 +26,12 @@ class CitiesORM(Base):
     __tablename__ = 'cities'
 
     city: Mapped[str] = mapped_column(primary_key=True)
-    weather_info_today: Mapped[str | None] = mapped_column(Text)
-    weather_forecast_for_3_days: Mapped[str | None] = mapped_column(Text)
-    air_quality_today: Mapped[str | None] = mapped_column(Text)
+    weather_info_today: Mapped[str | None]
+    weather_forecast_for_3_days: Mapped[str | None]
+    air_quality_today: Mapped[str | None]
 
-    today_update_on: Mapped[datetime] = mapped_column(DateTime, nullable=False)
-    days_3_update_on: Mapped[datetime] = mapped_column(DateTime, nullable=False)
-    air_quality_update_on: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    today_update_on: Mapped[datetime]
+    days_3_update_on: Mapped[datetime]
+    air_quality_update_on: Mapped[datetime]
 
     users: Mapped[UsersORM] = relationship(back_populates="city_info")

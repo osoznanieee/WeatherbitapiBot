@@ -14,9 +14,8 @@ class ConfigAPI(BaseSettings):
     API_KEY: str
     API_URL: str
 
-    model_config = SettingsConfigDict(env_file=os.path.normpath(fr'{__file__}\..\.env'.replace('\\', '/')))  # используется для
-    # конфигурации модели настроек
-
+    model_config = SettingsConfigDict(env_file=os.path.normpath(fr'{__file__}\..\.env'.replace('\\', '/')))
+    # используется для конфигурации модели настроек
     # __file__ - путь к текущему файлу
 
 config_api = ConfigAPI()
