@@ -59,7 +59,7 @@ class Database:
                 if self.__is_exists_tables:
                     await conn.run_sync(metadata.drop_all)
                     self.__is_exists_tables = False
-                    logger.info(f'Tables was dropped!')
+                    logger.critical(f'Tables was dropped!')
                     await conn.commit()
                 else:
                     logger.critical("No databases were created")
@@ -226,12 +226,13 @@ class Database:
                 logger.info(f'update air_quality_forecast_today for {city}')
                 return None if not user else user
 
-    async def insert_city_names(self, sql_commands: str):
-        """Срабатывает при флаге -a и create"""
+    async def execute_commands(self, sql_commands: list[str]):
+        """
+        Срабатывает при флагах -a и -d.
+        Исполняет SQL команды
+        """
         async with self.async_engine.begin() as connection:  # Открываем транзакцию
             for command in sql_commands:
                 if command.strip():
                     await connection.execute(text(command))
             await connection.commit()
-
-        logger.info('cities inserted successfully!')

@@ -43,17 +43,20 @@
 
 ```
 WeatherbitapiBot/
+├── argparser/
+│   ├── __init__.py
+│   └── argparser.py
 ├── bot/
+│   ├── __init__.py
 │   ├── add_city_names.sql
 │   ├── config.py
 │   ├── createbot.py
-│   ├── __init__.py
-│   ├── keyboards.py
-│   └── weatherbot.py
+│   ├── weather_bot.py
+│   └── keyboards.py
 ├── db/
+│   ├── __init__.py
 │   ├── config.py
 │   ├── database.py
-│   ├── __init__.py
 │   ├── models.py
 │   └── schemas.py
 ├── handlers/
@@ -62,14 +65,17 @@ WeatherbitapiBot/
 │   ├── other_handlers.py
 │   └── weather_handlers.py
 ├── logs/
-│   └── .gitkeep
+│   ├── __init__.py
+│   └── log.py
+├── weatherbitAPI/
+│   ├── __init.py
+│   ├── config.py
+│   ├── schemas.py
+│   └── weatherbit_api.py
+├── .gitignore
 ├── README.md
-├── requirements.txt
-└── weatherbitAPI/
-    ├── config.py
-    ├── __init__.py
-    ├── schemas.py
-    └── weatherbit_api.py
+└── requirements.txt
+
 ```
 
 ### Установка
@@ -113,8 +119,16 @@ WeatherbitapiBot/
    ```
 5. Запустите бота:
    ```bash
-   python weather_bot.py  
-   # Если происходит первый запуск то python weather_bot.py -a create
+   python weather_bot.py # обычный запуск
+   ```
+   ```bash
+   python weather_bot.py -a create # создать таблицы
+   ```
+   ```bash
+   python weather_bot.py -a create-drop # создать таблицы и удалить по принудительному завершению
+   ```
+   ```bash
+   python weather_bot.py -d drop # удалить все таблицы без запуска бота
    ```
 ## Использование
 

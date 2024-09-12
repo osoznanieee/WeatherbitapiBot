@@ -1,5 +1,6 @@
 logs/*
-!logs/.gitkeep
+!logs/log.py
+!logs/__init__.py
 
 .env
 .idea/
