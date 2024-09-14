@@ -1,3 +1,5 @@
+from typing import Literal
+
 from aiogram.types import (
     InlineKeyboardMarkup, InlineKeyboardButton
 )
@@ -13,7 +15,7 @@ class InlineKeyboards:
                 [InlineKeyboardButton(text='Профиль ⚙️', callback_data='profile'),
                  InlineKeyboardButton(text='Выбрать город 🗺️', callback_data='change_city')],
                 [InlineKeyboardButton(text='Прогноз каждый час 🌥️', callback_data='forecast_for_today')],
-                [InlineKeyboardButton(text='Прогноз на след. 3 дня 🌥️', callback_data='3_day_forecast')],
+                [InlineKeyboardButton(text='Прогноз на след. 3 дня 🌥️', callback_data='1_day')],
                 [InlineKeyboardButton(text='Качество воздуха на сегодня 🌬️', callback_data='air_quality')],
                 [InlineKeyboardButton(text='Другое', callback_data='other')]
             ], row_width=2)
@@ -24,6 +26,21 @@ class InlineKeyboards:
         """Инлайн клавиатура при показе погоды"""
         kb = InlineKeyboardMarkup(
             inline_keyboard=[
+                [InlineKeyboardButton(text='В главное меню', callback_data='main_menu')]
+            ], row_width=1)
+        return kb
+
+    @staticmethod
+    def change_days_forecasts_keyboard(first_day_date: str,
+                                       second_day_date: str,
+                                       first_day: Literal[1, 2, 3],
+                                       second_day: Literal[1, 2, 3]
+                                       ) -> InlineKeyboardMarkup:
+        """Инлайн клавиатура при показе погоды"""
+        kb = InlineKeyboardMarkup(
+            inline_keyboard=[
+                [InlineKeyboardButton(text=f'Прогноз на {first_day_date} 📆', callback_data=f'{first_day}_day')],
+                [InlineKeyboardButton(text=f'Прогноз на {second_day_date} 📆', callback_data=f'{second_day}_day')],
                 [InlineKeyboardButton(text='В главное меню', callback_data='main_menu')]
             ], row_width=1)
         return kb
@@ -130,7 +147,7 @@ class InlineKeyboards:
                 InlineKeyboardButton(text="Чебоксары", callback_data="гор_Чебоксары")
             ],
             [
-                InlineKeyboardButton(text="Назад ⬅️", callback_data="past_cities")
+                InlineKeyboardButton(text="Назад ⬅️", callback_data="change_city")
             ]
         ])
         return kb

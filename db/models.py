@@ -27,7 +27,11 @@ class CitiesORM(Base):
 
     city: Mapped[str] = mapped_column(primary_key=True)
     weather_info_today: Mapped[str | None]
-    weather_forecast_for_3_days: Mapped[str | None]
+
+    weather_forecast_for_1_day: Mapped[str | None]
+    weather_forecast_for_2_day: Mapped[str | None]
+    weather_forecast_for_3_day: Mapped[str | None]
+
     air_quality_today: Mapped[str | None]
 
     today_update_on: Mapped[datetime]

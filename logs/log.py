@@ -11,7 +11,7 @@ class Log:
                 format=lambda msg: f"{msg['file'].path} - {msg['message']} - {msg['time'].strftime('%Y-%m-%d - %H:%M')}\n",
                 level="INFO",
                 compression='zip',
-                rotation='1MB')
+                rotation='512 KB')
 
         except Exception as exc:
             logger.critical(f'ERROR: {exc}\nlogger was not added')

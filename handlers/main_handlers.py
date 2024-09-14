@@ -56,7 +56,7 @@ async def transition_to_change_city(callback_query: types.CallbackQuery):
         await bot.edit_message_text(
             chat_id=callback_query.message.chat.id,
             message_id=callback_query.message.message_id,
-            text='🏙️ Выберите один город из списка ниже: ',
+            text='🏙️ Выберите город из списка ниже: ',
             reply_markup=InlineKeyboards.first_30_cities_keyboard()
         )
     except MessageNotModified:

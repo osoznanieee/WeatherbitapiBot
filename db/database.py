@@ -158,14 +158,18 @@ class Database:
                 city = None if not res else CitiesScheme.from_orm(res.city_info)
                 return city
 
-    async def update_weather_info_forecast_by_city(self, city: str,
-                                                   new_weather_info_forecasts: str
-                                                   ) -> Optional[int]:
+    async def update_weather_info_forecasts_by_city(self, city: str,
+                                                    day1: str,
+                                                    day2: str,
+                                                    day3: str,
+                                                    ) -> Optional[int]:
         """Обновить прогнозы на 3 дня по городу"""
         async with self.async_session() as session:
             stmt = (
                 update(CitiesORM).
-                values(weather_forecast_for_3_days=new_weather_info_forecasts,
+                values(weather_forecast_for_1_day=day1,
+                       weather_forecast_for_2_day=day2,
+                       weather_forecast_for_3_day=day3,
                        days_3_update_on=datetime.now()).
                 where(CitiesORM.city == city).
                 execution_options(synchronize_session="fetch")

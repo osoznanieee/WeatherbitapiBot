@@ -45,23 +45,10 @@ async def back(callback_query: types.CallbackQuery):
 
 async def transition_to_change_city2(callback_query: types.CallbackQuery):
     try:
-        await bot.edit_message_text(
+        await bot.edit_message_reply_markup(
             chat_id=callback_query.message.chat.id,
             message_id=callback_query.message.message_id,
-            text='🏙️ Выберите один город из списка ниже:',
             reply_markup=InlineKeyboards.second_20_cities_keyboard()
-        )
-    except MessageNotModified:
-        await callback_query.answer('Вы уже нажали на кнопку')
-
-
-async def past_30_cities(callback_query: types.CallbackQuery):
-    try:
-        await bot.edit_message_text(
-            chat_id=callback_query.message.chat.id,
-            message_id=callback_query.message.message_id,
-            text='🏙️ Выберите один город из списка ниже: ',
-            reply_markup=InlineKeyboards.first_30_cities_keyboard()
         )
     except MessageNotModified:
         await callback_query.answer('Вы уже нажали на кнопку')
@@ -175,4 +162,3 @@ def register_other_handlers(dispatcher: Dispatcher):
     dispatcher.register_callback_query_handler(air_quality_index, lambda cb: cb.data == 'aqi_index')
     dispatcher.register_callback_query_handler(pollution_standards, lambda cb: cb.data == 'pollution_standards')
     dispatcher.register_callback_query_handler(transition_to_change_city2, lambda cb: cb.data == 'next_cities')
-    dispatcher.register_callback_query_handler(past_30_cities, lambda cb: cb.data == 'past_cities')

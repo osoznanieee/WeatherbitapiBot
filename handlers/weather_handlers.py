@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timedelta
 
 from aiogram import types
 from aiogram.utils.exceptions import MessageNotModified
@@ -21,21 +21,28 @@ api = WeatherAPI()
 handler = WeatherHandler()
 
 
-async def get_3_day_forecast(callback_query: types.CallbackQuery):
+async def get_1_day_forecast(callback_query: types.CallbackQuery):
     user: Optional[CitiesScheme] = await db.get_user_info(callback_query.from_user.id)
 
     if not user:
         await callback_query.answer('Вы не выбрали город!', show_alert=True)
     else:
-        is_updated_today = user.days_3_update_on.strftime("%Y-%m-%d") == datetime.datetime.now().strftime("%Y-%m-%d")
+        current_date = datetime.now().date()
+        date_2_day = (current_date + timedelta(days=2)).strftime("%Y-%m-%d")
+        date_3_day = (current_date + timedelta(days=3)).strftime("%Y-%m-%d")
 
-        if is_updated_today and user.weather_forecast_for_3_days:
+        is_updated_today: bool = user.days_3_update_on.strftime("%Y-%m-%d") == current_date.strftime("%Y-%m-%d")
+
+        if is_updated_today and user.weather_forecast_for_1_day:
             try:
                 await bot.edit_message_text(
                     chat_id=callback_query.message.chat.id,
                     message_id=callback_query.message.message_id,
-                    text=user.weather_forecast_for_3_days,
-                    reply_markup=InlineKeyboards.transition_to_main_keyboard(),
+                    text=user.weather_forecast_for_1_day,
+                    reply_markup=InlineKeyboards.change_days_forecasts_keyboard(
+                        first_day_date=date_2_day, second_day_date=date_3_day,
+                        first_day=2, second_day=3
+                    ),
                     parse_mode='HTML'
                 )
             except MessageNotModified:
@@ -56,10 +63,11 @@ async def get_3_day_forecast(callback_query: types.CallbackQuery):
             parsed_json = handler.parse_json_forecasts_for_3_days(forecast_json)
 
             weather: list[list[WeatherSchemeData]] = handler.get_3_days_forecast(parsed_json).data
-            text = ''
+
+            days: list[str] = []
 
             for day in weather:
-                day: list[WeatherSchemeData] = day
+                day: list[WeatherSchemeData]
 
                 lst = []
 
@@ -67,7 +75,7 @@ async def get_3_day_forecast(callback_query: types.CallbackQuery):
                     lst.append([*time.weather.description.items()])
                 lst = [sorted(sublist, key=lambda x: x[1], reverse=True) for sublist in lst]
 
-                text_plus = f"""
+                text_weather = f"""
 <u><b>Число - {day[0].datetime[:10]}</b></u> 📆
 
 
@@ -82,7 +90,7 @@ async def get_3_day_forecast(callback_query: types.CallbackQuery):
 УФ-индекс - {day[0].uv}
 <b>Статус погоды: 
 {lst[0][0][0]} - {round(lst[0][0][1] * (100 / 6))}%
-{f'{lst[0][1][0]} - {round(lst[0][1][1] * (100 / 6))}%' if len(lst[0]) > 1 else ' '}</b>
+{f'{lst[0][1][0]} - {round(lst[0][1][1] * (100 / 6))}%' if len(lst[0]) > 1 else ''}</b>
 
 <i><b>Утро (с 06 по {day[1].datetime[-2:]})</b></i> 🌅
 Направление ветра - {day[1].wind_cdir_full} 💨
@@ -95,7 +103,7 @@ async def get_3_day_forecast(callback_query: types.CallbackQuery):
 УФ-индекс - {day[1].uv}
 <b>Статус погоды: 
 {lst[1][0][0]} - {round(lst[1][0][1] * (100 / 6))}%
-{f'{lst[1][1][0]} - {round(lst[1][1][1] * (100 / 6))}%' if len(lst[1]) > 1 else ' '}</b>
+{f'{lst[1][1][0]} - {round(lst[1][1][1] * (100 / 6))}%' if len(lst[1]) > 1 else ''}</b>
          
 <i><b>День (с 12 по {day[2].datetime[-2:]})</b></i> 🌞
 Направление ветра - {day[2].wind_cdir_full} 💨
@@ -108,7 +116,7 @@ async def get_3_day_forecast(callback_query: types.CallbackQuery):
 УФ-индекс - {day[2].uv}
 <b>Статус погоды: 
 {lst[2][0][0]} - {round(lst[2][0][1] * (100 / 6))}%
-{f'{lst[2][1][0]} - {round(lst[2][1][1] * (100 / 6))}%' if len(lst[2]) > 1 else ' '}</b>
+{f'{lst[2][1][0]} - {round(lst[2][1][1] * (100 / 6))}%' if len(lst[2]) > 1 else ''}</b>
 
 <i><b>Вечер (с 18 по {day[3].datetime[-2:]})</b></i> 🌆
 Направление ветра - {day[3].wind_cdir_full} 💨
@@ -122,22 +130,110 @@ async def get_3_day_forecast(callback_query: types.CallbackQuery):
 <b>Статус погоды: 
 {lst[3][0][0]} - {round(lst[3][0][1] * (100 / 6))}%
 {f'{lst[3][1][0]} - {round(lst[3][1][1] * (100 / 6))}%' if len(lst[3]) > 1 else ''}</b>"""
-                text += f'{text_plus}\n\n'
+
+                if not days:
+                    try:
+                        await bot.edit_message_text(
+                            chat_id=callback_query.message.chat.id,
+                            message_id=callback_query.message.message_id,
+                            text=text_weather,
+                            reply_markup=InlineKeyboards.change_days_forecasts_keyboard(
+                                first_day_date=date_2_day, second_day_date=date_3_day,
+                                first_day=2, second_day=3
+                            ),
+                            parse_mode="HTML"
+                        )
+                    except MessageNotModified:
+                        await callback_query.answer('Вы уже нажали на кнопку')
+
+                days.append(text_weather)
+
+            await db.update_weather_info_forecasts_by_city(
+                city=user.city,
+                day1=days[0],
+                day2=days[1],
+                day3=days[2]
+            )
+
+
+async def get_2_day_forecast(callback_query: types.CallbackQuery):
+    user: Optional[CitiesScheme] = await db.get_user_info(callback_query.from_user.id)
+
+    if not user:
+        await callback_query.answer('Вы не выбрали город!', show_alert=True)
+    else:
+        current_date = datetime.now().date()
+        date_1_day = (current_date + timedelta(days=1)).strftime("%Y-%m-%d")
+        date_3_day = (current_date + timedelta(days=3)).strftime("%Y-%m-%d")
+
+        is_updated_today = user.days_3_update_on.strftime("%Y-%m-%d") == current_date.strftime("%Y-%m-%d")
+
+        if is_updated_today and user.weather_forecast_for_2_day:
             try:
                 await bot.edit_message_text(
                     chat_id=callback_query.message.chat.id,
                     message_id=callback_query.message.message_id,
-                    text=text + '\nЛистай сверху вниз ⬆️',
-                    reply_markup=InlineKeyboards.transition_to_main_keyboard(),
+                    text=user.weather_forecast_for_2_day,
+                    reply_markup=InlineKeyboards.change_days_forecasts_keyboard(
+                        first_day_date=date_1_day, second_day_date=date_3_day,
+                        first_day=1, second_day=3
+                    ),
                     parse_mode='HTML'
                 )
             except MessageNotModified:
-                await callback_query.answer('Вы уже нажали на кнопку В главное меню')
-            else:
-                await db.update_weather_info_forecast_by_city(
-                    city=user.city,
-                    new_weather_info_forecasts=text + 'Листай сверху вниз ⬆️'
+                await callback_query.answer('Вы уже нажали на кнопку')
+
+        else:
+            try:
+                await callback_query.answer('Неактуально...', show_alert=True)
+                await bot.edit_message_text(
+                    chat_id=callback_query.message.chat.id,
+                    message_id=callback_query.message.message_id,
+                    text="Главное меню:  ",
+                    reply_markup=InlineKeyboards.main_keyboard(),
                 )
+            except MessageNotModified:
+                await callback_query.answer('Вы уже нажали на кнопку')
+
+
+async def get_3_day_forecast(callback_query: types.CallbackQuery):
+    user: Optional[CitiesScheme] = await db.get_user_info(callback_query.from_user.id)
+
+    if not user:
+        await callback_query.answer('Вы не выбрали город!', show_alert=True)
+    else:
+        current_date = datetime.now().date()
+        date_1_day = (current_date + timedelta(days=1)).strftime("%Y-%m-%d")
+        date_2_day = (current_date + timedelta(days=2)).strftime("%Y-%m-%d")
+
+        is_updated_today = user.days_3_update_on.strftime("%Y-%m-%d") == current_date.strftime("%Y-%m-%d")
+
+        if is_updated_today and user.weather_forecast_for_3_day:
+            try:
+                await bot.edit_message_text(
+                    chat_id=callback_query.message.chat.id,
+                    message_id=callback_query.message.message_id,
+                    text=user.weather_forecast_for_3_day,
+                    reply_markup=InlineKeyboards.change_days_forecasts_keyboard(
+                        first_day_date=date_1_day, second_day_date=date_2_day,
+                        first_day=1, second_day=2
+                    ),
+                    parse_mode='HTML'
+                )
+            except MessageNotModified:
+                await callback_query.answer('Вы уже нажали на кнопку')
+
+        else:
+            try:
+                await callback_query.answer('Неактуально...', show_alert=True)
+                await bot.edit_message_text(
+                    chat_id=callback_query.message.chat.id,
+                    message_id=callback_query.message.message_id,
+                    text="Главное меню:  ",
+                    reply_markup=InlineKeyboards.main_keyboard(),
+                )
+            except MessageNotModified:
+                await callback_query.answer('Вы уже нажали на кнопку')
 
 
 async def get_today_forecast(callback_query: types.CallbackQuery):
@@ -146,7 +242,7 @@ async def get_today_forecast(callback_query: types.CallbackQuery):
     if not user:
         await callback_query.answer('Вы не выбрали город!', show_alert=True)
     else:
-        is_updated_now = user.today_update_on.strftime("%Y-%m-%d-%H") == datetime.datetime.now().strftime("%Y-%m-%d-%H")
+        is_updated_now = user.today_update_on.strftime("%Y-%m-%d-%H") == datetime.now().strftime("%Y-%m-%d-%H")
 
         if is_updated_now and user.weather_info_today:
             try:
@@ -179,7 +275,7 @@ async def get_today_forecast(callback_query: types.CallbackQuery):
                     data: WeatherSchemeDataToday = handler.parse_json_forecasts_for_today(json)
 
                     text = f"""
-<i><b>Дата - {datetime.datetime.now().strftime("%Y-%m-%d  %H")} часов</b></i> 📆
+<i><b>Дата - {datetime.now().strftime("%Y-%m-%d  %H")} часов</b></i> 📆
 
 Время восхода солнца - {data.sunrise} (UTC +3:00) 🌇
 Время заката - {data.sunset} (UTC +3:00) 🏙
@@ -224,7 +320,7 @@ async def get_today_air_quality_forecast(callback_query: types.CallbackQuery):
     if not user:
         await callback_query.answer('Вы не выбрали город!', show_alert=True)
     else:
-        is_updated_now = user.air_quality_update_on.strftime("%Y-%m-%d") == datetime.datetime.now().strftime("%Y-%m-%d")
+        is_updated_now = user.air_quality_update_on.strftime("%Y-%m-%d") == datetime.now().strftime("%Y-%m-%d")
 
         if is_updated_now and user.weather_info_today:
             try:
@@ -265,7 +361,7 @@ async def get_today_air_quality_forecast(callback_query: types.CallbackQuery):
                     }
 
                     text = f"""
-<i><b>Дата - {datetime.datetime.now().strftime("%Y-%m-%d")}</b></i> 🕒
+<i><b>Дата - {datetime.now().strftime("%Y-%m-%d")}</b></i> 🕒
 
 Индекс качества воздуха: {data.aqi} 🌬️
 
@@ -304,6 +400,8 @@ async def get_today_air_quality_forecast(callback_query: types.CallbackQuery):
 
 
 def register_weather_handlers(dispatcher: Dispatcher):
-    dispatcher.register_callback_query_handler(get_3_day_forecast, lambda cb: cb.data == '3_day_forecast')
+    dispatcher.register_callback_query_handler(get_1_day_forecast, lambda cb: cb.data == '1_day')
+    dispatcher.register_callback_query_handler(get_2_day_forecast, lambda cb: cb.data == '2_day')
+    dispatcher.register_callback_query_handler(get_3_day_forecast, lambda cb: cb.data == '3_day')
     dispatcher.register_callback_query_handler(get_today_forecast, lambda cb: cb.data == 'forecast_for_today')
     dispatcher.register_callback_query_handler(get_today_air_quality_forecast, lambda cb: cb.data == 'air_quality')
