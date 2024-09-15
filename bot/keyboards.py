@@ -15,7 +15,7 @@ class InlineKeyboards:
                 [InlineKeyboardButton(text='Профиль ⚙️', callback_data='profile'),
                  InlineKeyboardButton(text='Выбрать город 🗺️', callback_data='change_city')],
                 [InlineKeyboardButton(text='Прогноз каждый час 🌥️', callback_data='forecast_for_today')],
-                [InlineKeyboardButton(text='Прогноз на след. 3 дня 🌥️', callback_data='1_day')],
+                [InlineKeyboardButton(text='Прогноз на след. 4 дня 🌥️', callback_data='1_day')],
                 [InlineKeyboardButton(text='Качество воздуха на сегодня 🌬️', callback_data='air_quality')],
                 [InlineKeyboardButton(text='Другое', callback_data='other')]
             ], row_width=2)
@@ -33,14 +33,18 @@ class InlineKeyboards:
     @staticmethod
     def change_days_forecasts_keyboard(first_day_date: str,
                                        second_day_date: str,
-                                       first_day: Literal[1, 2, 3],
-                                       second_day: Literal[1, 2, 3]
+                                       third_day_date: str,
+
+                                       first_day: Literal[1, 2, 3, 4],
+                                       second_day: Literal[1, 2, 3, 4],
+                                       third_day: Literal[1, 2, 3, 4],
                                        ) -> InlineKeyboardMarkup:
         """Инлайн клавиатура при показе погоды"""
         kb = InlineKeyboardMarkup(
             inline_keyboard=[
                 [InlineKeyboardButton(text=f'Прогноз на {first_day_date} 📆', callback_data=f'{first_day}_day')],
                 [InlineKeyboardButton(text=f'Прогноз на {second_day_date} 📆', callback_data=f'{second_day}_day')],
+                [InlineKeyboardButton(text=f'Прогноз на {third_day_date} 📆', callback_data=f'{third_day}_day')],
                 [InlineKeyboardButton(text='В главное меню', callback_data='main_menu')]
             ], row_width=1)
         return kb

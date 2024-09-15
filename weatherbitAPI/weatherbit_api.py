@@ -17,7 +17,7 @@ class WeatherAPI:
         self.api_key: str = config_api.API_KEY
         self.api_url: str = config_api.API_URL
 
-    async def get_3_day_forecasts(self, city: str) -> str:
+    async def get_4_days_forecasts(self, city: str) -> str:
         """
         Делает запрос прогнозов сразу на 3 дня вперед (не считая текущий)
 
@@ -36,7 +36,7 @@ class WeatherAPI:
 
             async with session.get(url=self.api_url + 'forecast/hourly', params={
                 'key': self.api_key,
-                'hours': 72 + time_plus,
+                'hours': 96 + time_plus,
                 'lang': 'ru',
                 'city': city
             }
@@ -50,11 +50,11 @@ class WeatherAPI:
                     intrmdt_json = '[' + input_json[input_json.find('},{') + 2:]
 
                     out_json: str = '{"data":' + intrmdt_json[:intrmdt_json.find(',"lat"')] + '}'
-                    logger.info(f'successful forecasts_for_3_days request for {city}')
+                    logger.info(f'successful forecasts_for_4_days request for {city}')
                     return out_json
 
                 else:
-                    logger.critical(f'ERROR: unsuccessful request for forecasts3days: {response}')
+                    logger.critical(f'ERROR: unsuccessful request for forecasts4days: {response}')
                     raise ValueError(f'Что-то пошло не так: {response}')
 
     async def get_weather_for_today(self, city: str) -> str:
@@ -106,14 +106,15 @@ class WeatherAPI:
 
 
 class WeatherHandler:
-    __forecasts3days = tuple[
+    __forecasts4days = tuple[
+        list[WeatherSchemeData],
         list[WeatherSchemeData],
         list[WeatherSchemeData],
         list[WeatherSchemeData]
     ]
 
     @staticmethod
-    def parse_json_forecasts_for_3_days(json: str) -> __forecasts3days:
+    def parse_json_forecasts_for_4_days(json: str) -> __forecasts4days:
         """
         :param json: исходный json
         :return: возвращает кортеж в котором 3 списка (в каждом списке по 24 объекта WeatherSchemeData
@@ -124,16 +125,17 @@ class WeatherHandler:
             today_and_forecasts = (
                 obj[: 24],  # завтра
                 obj[24: 48],  # послезавтра
-                obj[48:],  # после послезавтра
+                obj[48: 72],  # после послезавтра
+                obj[72: 96]
             )
         except Exception as exc:
-            logger.critical(f'ERROR: unsuccessful parse json for forecastsfor3days: {exc}')
+            logger.critical(f'ERROR: unsuccessful parse json for forecastsfor4days: {exc}')
             raise exc
         else:
             return today_and_forecasts
 
     @staticmethod
-    def get_3_days_forecast(list_objects: __forecasts3days) -> WeatherScheme:
+    def get_4_days_forecasts(list_objects: __forecasts4days) -> WeatherScheme:
         """
         Сортировка данных за 72 часа по 1 дню. Каждый день - список из объектов
         WeatherSchemeData
@@ -144,7 +146,7 @@ class WeatherHandler:
         :return: возвращает WeatherScheme (в data хранится 3 списка в каждом из которых по 4 объекта WeatherSchemeData)
         """
         try:
-            days = [], [], []
+            days = [], [], [], []
 
             for index, day in enumerate(list_objects):
 
@@ -202,7 +204,7 @@ class WeatherHandler:
                 days[index].extend(times)
             data = WeatherScheme(data=[*days])
         except Exception as exc:
-            logger.critical(f'ERROR: unsuccessful parse objects for forecastsfor3days: {exc}')
+            logger.critical(f'ERROR: unsuccessful parse objects for forecastsfor4days: {exc}')
             raise exc
         else:
             logger.info('successful parse')

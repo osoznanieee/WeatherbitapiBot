@@ -31,11 +31,12 @@ class CitiesORM(Base):
     weather_forecast_for_1_day: Mapped[str | None]
     weather_forecast_for_2_day: Mapped[str | None]
     weather_forecast_for_3_day: Mapped[str | None]
+    weather_forecast_for_4_day: Mapped[str | None]
 
     air_quality_today: Mapped[str | None]
 
     today_update_on: Mapped[datetime]
-    days_3_update_on: Mapped[datetime]
+    days_4_update_on: Mapped[datetime]
     air_quality_update_on: Mapped[datetime]
 
     users: Mapped[UsersORM] = relationship(back_populates="city_info")

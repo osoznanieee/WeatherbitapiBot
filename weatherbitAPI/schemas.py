@@ -13,8 +13,8 @@ class ConfigMixin(BaseModel):
 
 
 class WeatherSchemeDataData(ConfigMixin):
-    icon: str = Field(description='Код значка погоды')
-    code: int = Field(description='Код погоды')
+    # icon: str = Field(description='Код значка погоды')
+    # code: int = Field(description='Код погоды')
     description: str | dict[str, int] = Field(description='Текстовое описание погоды')
 
 
