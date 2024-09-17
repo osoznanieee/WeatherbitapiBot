@@ -20,6 +20,16 @@ api = WeatherAPI()
 
 handler = WeatherHandler()
 
+days_of_week = {
+    'Monday': 'Понедельник',
+    'Tuesday': 'Вторник',
+    'Wednesday': 'Среду',
+    'Thursday': 'Четверг',
+    'Friday': 'Пятницу',
+    'Saturday': 'Субботу',
+    'Sunday': 'Воскресенье'
+}
+
 
 async def get_1_day_forecast(callback_query: types.CallbackQuery):
     user: Optional[CitiesScheme] = await db.get_user_info(callback_query.from_user.id)
@@ -28,11 +38,30 @@ async def get_1_day_forecast(callback_query: types.CallbackQuery):
         await callback_query.answer('Вы не выбрали город!', show_alert=True)
     else:
         current_date = datetime.now().date()
-        date_2_day = (current_date + timedelta(days=2)).strftime("%Y-%m-%d")
-        date_3_day = (current_date + timedelta(days=3)).strftime("%Y-%m-%d")
-        date_4_day = (current_date + timedelta(days=4)).strftime("%Y-%m-%d")
+        date_2_day = (current_date + timedelta(days=2))
+        date_3_day = (current_date + timedelta(days=3))
+        date_4_day = (current_date + timedelta(days=4))
+        date_5_day = (current_date + timedelta(days=5))
+        date_6_day = (current_date + timedelta(days=6))
+        date_7_day = (current_date + timedelta(days=7))
 
-        is_updated_today: bool = user.days_4_update_on.strftime("%Y-%m-%d") == current_date.strftime("%Y-%m-%d")
+        data = {
+            'day_2': 2,
+            'day_3': 3,
+            'day_4': 4,
+            'day_5': 5,
+            'day_6': 6,
+            'day_7': 7,
+
+            'date_of_2_day': f'{days_of_week[date_2_day.strftime("%A")]} {date_2_day.strftime("%Y-%m-%d")}',
+            'date_of_3_day': f'{days_of_week[date_3_day.strftime("%A")]} {date_3_day.strftime("%Y-%m-%d")}',
+            'date_of_4_day': f'{days_of_week[date_4_day.strftime("%A")]} {date_4_day.strftime("%Y-%m-%d")}',
+            'date_of_5_day': f'{days_of_week[date_5_day.strftime("%A")]} {date_5_day.strftime("%Y-%m-%d")}',
+            'date_of_6_day': f'{days_of_week[date_6_day.strftime("%A")]} {date_6_day.strftime("%Y-%m-%d")}',
+            'date_of_7_day': f'{days_of_week[date_7_day.strftime("%A")]} {date_7_day.strftime("%Y-%m-%d")}',
+        }
+
+        is_updated_today: bool = user.days_7_update_on.strftime("%Y-%m-%d") == current_date.strftime("%Y-%m-%d")
 
         if is_updated_today and user.weather_forecast_for_1_day:
             try:
@@ -40,10 +69,7 @@ async def get_1_day_forecast(callback_query: types.CallbackQuery):
                     chat_id=callback_query.message.chat.id,
                     message_id=callback_query.message.message_id,
                     text=user.weather_forecast_for_1_day,
-                    reply_markup=InlineKeyboards.change_days_forecasts_keyboard(
-                        day_2=2, day_3=3, day_4=4,
-                        date_of_2_day=date_2_day, date_of_3_day=date_3_day, date_of_4_day=date_4_day
-                    ),
+                    reply_markup=InlineKeyboards.change_days_forecasts_keyboard(**data),
                     parse_mode='HTML'
                 )
             except MessageNotModified:
@@ -59,11 +85,11 @@ async def get_1_day_forecast(callback_query: types.CallbackQuery):
                 )
             except MessageNotModified:
                 await callback_query.answer('Вы уже нажали на кнопку')
+            newline = '\n'
+            forecast_json = await api.get_7_days_forecasts(city=user.city)
+            parsed_json = handler.parse_json_forecasts_for_7_days(forecast_json)
 
-            forecast_json = await api.get_4_days_forecasts(city=user.city)
-            parsed_json = handler.parse_json_forecasts_for_4_days(forecast_json)
-
-            weather: list[list[WeatherSchemeData]] = handler.get_4_days_forecasts(parsed_json).data
+            weather: list[list[WeatherSchemeData]] = handler.get_7_days_forecasts(parsed_json).data
 
             days: list[str] = []
 
@@ -91,7 +117,7 @@ async def get_1_day_forecast(callback_query: types.CallbackQuery):
 УФ-индекс - {day[0].uv}
 <b>Статус погоды: 
 {lst[0][0][0]} - {round(lst[0][0][1] * (100 / 6))}%
-{f'{lst[0][1][0]} - {round(lst[0][1][1] * (100 / 6))}%' if len(lst[0]) > 1 else ''}</b>
+{f'{lst[0][1][0]} - {round(lst[0][1][1] * (100 / 6))}%{newline}' if len(lst[0]) > 1 else ''}</b>
 
 <i><b>Утро (с 06 по {day[1].datetime[-2:]})</b></i> 🌅
 Направление ветра - {day[1].wind_cdir_full} 💨
@@ -104,8 +130,8 @@ async def get_1_day_forecast(callback_query: types.CallbackQuery):
 УФ-индекс - {day[1].uv}
 <b>Статус погоды: 
 {lst[1][0][0]} - {round(lst[1][0][1] * (100 / 6))}%
-{f'{lst[1][1][0]} - {round(lst[1][1][1] * (100 / 6))}%' if len(lst[1]) > 1 else ''}</b>
-         
+{f'{lst[1][1][0]} - {round(lst[1][1][1] * (100 / 6))}%{newline}' if len(lst[1]) > 1 else ''}</b>
+
 <i><b>День (с 12 по {day[2].datetime[-2:]})</b></i> 🌞
 Направление ветра - {day[2].wind_cdir_full} 💨
 Температура - {round(day[2].temp, 1)}°C 🌡
@@ -117,7 +143,7 @@ async def get_1_day_forecast(callback_query: types.CallbackQuery):
 УФ-индекс - {day[2].uv}
 <b>Статус погоды: 
 {lst[2][0][0]} - {round(lst[2][0][1] * (100 / 6))}%
-{f'{lst[2][1][0]} - {round(lst[2][1][1] * (100 / 6))}%' if len(lst[2]) > 1 else ''}</b>
+{f'{lst[2][1][0]} - {round(lst[2][1][1] * (100 / 6))}%{newline}' if len(lst[2]) > 1 else ''}</b>
 
 <i><b>Вечер (с 18 по {day[3].datetime[-2:]})</b></i> 🌆
 Направление ветра - {day[3].wind_cdir_full} 💨
@@ -130,7 +156,8 @@ async def get_1_day_forecast(callback_query: types.CallbackQuery):
 УФ-индекс - {day[3].uv}
 <b>Статус погоды: 
 {lst[3][0][0]} - {round(lst[3][0][1] * (100 / 6))}%
-{f'{lst[3][1][0]} - {round(lst[3][1][1] * (100 / 6))}%' if len(lst[3]) > 1 else ''}</b>"""
+{f'{lst[3][1][0]} - {round(lst[3][1][1] * (100 / 6))}%' if len(lst[3]) > 1 else ''}</b>""" \
+                    .replace('\n\n', '\n').replace('\n', '\n\n', 2)
 
                 if not days:
                     try:
@@ -138,10 +165,7 @@ async def get_1_day_forecast(callback_query: types.CallbackQuery):
                             chat_id=callback_query.message.chat.id,
                             message_id=callback_query.message.message_id,
                             text=text_weather,
-                            reply_markup=InlineKeyboards.change_days_forecasts_keyboard(
-                                day_2=2, day_3=3, day_4=4,
-                                date_of_2_day=date_2_day, date_of_3_day=date_3_day, date_of_4_day=date_4_day
-                            ),
+                            reply_markup=InlineKeyboards.change_days_forecasts_keyboard(**data),
                             parse_mode="HTML"
                         )
                     except MessageNotModified:
@@ -154,11 +178,14 @@ async def get_1_day_forecast(callback_query: types.CallbackQuery):
                 day1=days[0],
                 day2=days[1],
                 day3=days[2],
-                day4=days[3]
+                day4=days[3],
+                day5=days[4],
+                day6=days[5],
+                day7=days[6]
             )
 
 
-async def get_4_days_forecasts(callback_query: types.CallbackQuery):
+async def get_7_days_forecasts(callback_query: types.CallbackQuery):
     user: Optional[CitiesScheme] = await db.get_user_info(callback_query.from_user.id)
 
     if not user:
@@ -174,10 +201,13 @@ async def get_4_days_forecasts(callback_query: types.CallbackQuery):
             await callback_query.answer('Вы уже нажали на кнопку')
     else:
         current_date = datetime.now().date()
-        date_1_day = (current_date + timedelta(days=1)).strftime("%Y-%m-%d")
-        date_2_day = (current_date + timedelta(days=2)).strftime("%Y-%m-%d")
-        date_3_day = (current_date + timedelta(days=3)).strftime("%Y-%m-%d")
-        date_4_day = (current_date + timedelta(days=4)).strftime("%Y-%m-%d")
+        date_1_day = (current_date + timedelta(days=1))
+        date_2_day = (current_date + timedelta(days=2))
+        date_3_day = (current_date + timedelta(days=3))
+        date_4_day = (current_date + timedelta(days=4))
+        date_5_day = (current_date + timedelta(days=5))
+        date_6_day = (current_date + timedelta(days=6))
+        date_7_day = (current_date + timedelta(days=7))
 
         day = callback_query.data[0]
 
@@ -186,19 +216,25 @@ async def get_4_days_forecasts(callback_query: types.CallbackQuery):
             'day_2': 2,
             'day_3': 3,
             'day_4': 4,
+            'day_5': 5,
+            'day_6': 6,
+            'day_7': 7,
 
-            'date_of_1_day': date_1_day,
-            'date_of_2_day': date_2_day,
-            'date_of_3_day': date_3_day,
-            'date_of_4_day': date_4_day,
+            'date_of_1_day': f'{days_of_week[date_1_day.strftime("%A")]} {date_1_day.strftime("%Y-%m-%d")}',
+            'date_of_2_day': f'{days_of_week[date_2_day.strftime("%A")]} {date_2_day.strftime("%Y-%m-%d")}',
+            'date_of_3_day': f'{days_of_week[date_3_day.strftime("%A")]} {date_3_day.strftime("%Y-%m-%d")}',
+            'date_of_4_day': f'{days_of_week[date_4_day.strftime("%A")]} {date_4_day.strftime("%Y-%m-%d")}',
+            'date_of_5_day': f'{days_of_week[date_5_day.strftime("%A")]} {date_5_day.strftime("%Y-%m-%d")}',
+            'date_of_6_day': f'{days_of_week[date_6_day.strftime("%A")]} {date_6_day.strftime("%Y-%m-%d")}',
+            'date_of_7_day': f'{days_of_week[date_7_day.strftime("%A")]} {date_7_day.strftime("%Y-%m-%d")}',
         }
 
         del data[f'day_{day}']
         del data[f'date_of_{day}_day']
 
-        is_updated_today = user.days_4_update_on.strftime("%Y-%m-%d") == current_date.strftime("%Y-%m-%d")
+        is_updated_today = user.days_7_update_on.strftime("%Y-%m-%d") == current_date.strftime("%Y-%m-%d")
 
-        if is_updated_today and user.weather_forecast_for_2_day:
+        if is_updated_today and user.weather_forecast_for_1_day:
             try:
                 await bot.edit_message_text(
                     chat_id=callback_query.message.chat.id,
@@ -388,6 +424,8 @@ async def get_today_air_quality_forecast(callback_query: types.CallbackQuery):
 
 def register_weather_handlers(dispatcher: Dispatcher):
     dispatcher.register_callback_query_handler(get_1_day_forecast, lambda cb: cb.data == '1_day')
-    dispatcher.register_callback_query_handler(get_4_days_forecasts, lambda cb: cb.data in ('2_day', '3_day', '4_day'))
+    dispatcher.register_callback_query_handler(get_7_days_forecasts, lambda cb: cb.data in (
+                                                                                '2_day', '3_day', '4_day',
+                                                                                '5_day', '6_day', '7_day'))
     dispatcher.register_callback_query_handler(get_today_forecast, lambda cb: cb.data == 'forecast_for_today')
     dispatcher.register_callback_query_handler(get_today_air_quality_forecast, lambda cb: cb.data == 'air_quality')

@@ -17,7 +17,7 @@ class InlineKeyboards:
                 [InlineKeyboardButton(text='Профиль ⚙️', callback_data='profile'),
                  InlineKeyboardButton(text='Выбрать город 🗺️', callback_data='change_city')],
                 [InlineKeyboardButton(text='Прогноз каждый час 🌥️', callback_data='forecast_for_today')],
-                [InlineKeyboardButton(text='Прогноз на след. 4 дня 🌥️', callback_data='1_day')],
+                [InlineKeyboardButton(text='Прогноз на следующие 7 дней 🌥️', callback_data='1_day')],
                 [InlineKeyboardButton(text='Качество воздуха на сегодня 🌬️', callback_data='air_quality')],
                 [InlineKeyboardButton(text='Другое', callback_data='other')]
             ], row_width=2)
@@ -38,15 +38,21 @@ class InlineKeyboards:
             day_2: Optional[Literal[2]] = None,
             day_3: Optional[Literal[3]] = None,
             day_4: Optional[Literal[4]] = None,
+            day_5: Optional[Literal[5]] = None,
+            day_6: Optional[Literal[6]] = None,
+            day_7: Optional[Literal[7]] = None,
 
             date_of_1_day: Optional[str] = None,
             date_of_2_day: Optional[str] = None,
             date_of_3_day: Optional[str] = None,
             date_of_4_day: Optional[str] = None,
+            date_of_5_day: Optional[str] = None,
+            date_of_6_day: Optional[str] = None,
+            date_of_7_day: Optional[str] = None,
 
             ) -> InlineKeyboardMarkup:
         """Инлайн клавиатура при показе погоды"""
-        inline_keyboard = InlineKeyboardMarkup(row_width=2)
+        inline_keyboard = InlineKeyboardMarkup(row_width=1)
 
         inline_keyboard.add(InlineKeyboardButton(text=f'Прогноз на {date_of_1_day} 📆', callback_data=f'{day_1}_day')) \
             if day_1 else ...
@@ -56,6 +62,12 @@ class InlineKeyboards:
             if day_3 else ...
         inline_keyboard.add(InlineKeyboardButton(text=f'Прогноз на {date_of_4_day} 📆', callback_data=f'{day_4}_day')) \
             if day_4 else ...
+        inline_keyboard.add(InlineKeyboardButton(text=f'Прогноз на {date_of_5_day} 📆', callback_data=f'{day_5}_day')) \
+            if day_5 else ...
+        inline_keyboard.add(InlineKeyboardButton(text=f'Прогноз на {date_of_6_day} 📆', callback_data=f'{day_6}_day')) \
+            if day_6 else ...
+        inline_keyboard.add(InlineKeyboardButton(text=f'Прогноз на {date_of_7_day} 📆', callback_data=f'{day_7}_day')) \
+            if day_7 else ...
         inline_keyboard.add(InlineKeyboardButton(text='В главное меню', callback_data='main_menu'))
 
         return inline_keyboard

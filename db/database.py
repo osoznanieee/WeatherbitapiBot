@@ -162,7 +162,10 @@ class Database:
                                                     day1: str,
                                                     day2: str,
                                                     day3: str,
-                                                    day4: str
+                                                    day4: str,
+                                                    day5: str,
+                                                    day6: str,
+                                                    day7: str
                                                     ) -> Optional[int]:
         """Обновить прогнозы на 3 дня по городу"""
         async with self.async_session() as session:
@@ -172,7 +175,10 @@ class Database:
                        weather_forecast_for_2_day=day2,
                        weather_forecast_for_3_day=day3,
                        weather_forecast_for_4_day=day4,
-                       days_4_update_on=datetime.now()).
+                       weather_forecast_for_5_day=day5,
+                       weather_forecast_for_6_day=day6,
+                       weather_forecast_for_7_day=day7,
+                       days_7_update_on=datetime.now()).
                 where(CitiesORM.city == city).
                 execution_options(synchronize_session="fetch")
             )
@@ -180,10 +186,10 @@ class Database:
                 user = (await session.execute(stmt)).rowcount
                 await session.commit()
             except Exception as exc:
-                logger.critical(f'ERROR! something went wrong with the weather_frcst4 update!: {exc}')
+                logger.critical(f'ERROR! something went wrong with the weather_frcst7 update!: {exc}')
                 raise exc
             else:
-                logger.info(f'update forecast_for_4_days for {city}')
+                logger.info(f'update forecast_for_7_days for {city}')
                 return None if not user else user
 
     async def update_weather_info_today_by_city(self, city: str,
