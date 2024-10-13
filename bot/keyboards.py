@@ -16,7 +16,7 @@ class InlineKeyboards:
             inline_keyboard=[
                 [InlineKeyboardButton(text='Профиль ⚙️', callback_data='profile'),
                  InlineKeyboardButton(text='Выбрать город 🗺️', callback_data='change_city')],
-                [InlineKeyboardButton(text='Прогноз каждый час 🌥️', callback_data='forecast_for_today')],
+                [InlineKeyboardButton(text='Текущие погодные условия 🌥️', callback_data='forecast_for_today')],
                 [InlineKeyboardButton(text='Прогноз на следующие 7 дней 🌥️', callback_data='1_day')],
                 [InlineKeyboardButton(text='Качество воздуха на сегодня 🌬️', callback_data='air_quality')],
                 [InlineKeyboardButton(text='Другое', callback_data='other')]
@@ -187,16 +187,34 @@ class InlineKeyboards:
                 [InlineKeyboardButton(text='Связь 📞', callback_data='dev')],
                 [InlineKeyboardButton(text='УФ-Индекс', callback_data='uv_index')],
                 [InlineKeyboardButton(text='Индекс качества воздуха', callback_data='aqi_index')],
-                [InlineKeyboardButton(text='Нормы загрязняющих веществ', callback_data='pollution_standards')],
+                [InlineKeyboardButton(text='Нормы концетрации веществ', callback_data='pollution_standards')],
                 [InlineKeyboardButton(text='В главное меню', callback_data='main_menu')]
             ], row_width=1)
         return kb
 
     @staticmethod
     def back_keyboard() -> InlineKeyboardMarkup:
-        """Инлайн клавиатура при показе автора (чтобы вернутся в меню 'Другое')"""
+        """Инлайн клавиатура чтобы вернутся в меню 'Другое'"""
         kb = InlineKeyboardMarkup(
             inline_keyboard=[
                 [InlineKeyboardButton(text='Назад', callback_data='back')]
             ], row_width=1)
+        return kb
+
+    @staticmethod
+    def back_keyboard_from_concentrations(pol_st: Literal['ozone', 'sulfur', 'nitrogen', 'carbon']) \
+            -> InlineKeyboardMarkup:
+        """Инлайн клавиатура чтобы вернутся в меню 'Другое' с раздела где нормы концетрации веществ"""
+
+        kb = InlineKeyboardMarkup(row_width=1)
+        kb.add(InlineKeyboardButton(text='Концентрации озона 🌫️',
+                                    callback_data='pollution_standards_ozone')) if pol_st != 'ozone' else ...
+        kb.add(InlineKeyboardButton(text='Концентрация диоксида серы 🏭',
+                                    callback_data='pollution_standards_sulfur')) if pol_st != 'sulfur' else ...
+        kb.add(InlineKeyboardButton(text='Концентрация диоксида азота 🚗',
+                                    callback_data='pollution_standards_nitrogen')) if pol_st != 'nitrogen' else ...
+        kb.add(InlineKeyboardButton(text='Концентрация угарного газа 🔥',
+                                    callback_data='pollution_standards_carbon')) if pol_st != 'carbon' else ...
+        kb.add(InlineKeyboardButton(text='Назад', callback_data='back'))
+
         return kb

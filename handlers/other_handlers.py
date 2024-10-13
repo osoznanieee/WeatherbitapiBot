@@ -43,17 +43,6 @@ async def back(callback_query: types.CallbackQuery):
         await callback_query.answer('Вы уже нажали на кнопку Назад')
 
 
-async def transition_to_change_city2(callback_query: types.CallbackQuery):
-    try:
-        await bot.edit_message_reply_markup(
-            chat_id=callback_query.message.chat.id,
-            message_id=callback_query.message.message_id,
-            reply_markup=InlineKeyboards.second_20_cities_keyboard()
-        )
-    except MessageNotModified:
-        await callback_query.answer('Вы уже нажали на кнопку')
-
-
 async def uv_index(callback_query: types.CallbackQuery):
     try:
         await bot.edit_message_text(
@@ -107,20 +96,24 @@ async def air_quality_index(callback_query: types.CallbackQuery):
 
 
 async def pollution_standards(callback_query: types.CallbackQuery):
-    try:
-        await bot.edit_message_text(
-            chat_id=callback_query.message.chat.id,
-            message_id=callback_query.message.message_id,
-            text="""
+
+    pollution = callback_query.data[20:]
+    info = None
+
+    if pollution == 'ozone' or callback_query.data == 'pollution_standards':
+        info = """
 <i>Шкала концентрации озона варьируется от <b>0</b> до <b>180</b> µг/м³:</i>
 
 ･ <b>0–30</b>: Низкий уровень озона. Воздух безопасен для большинства людей.
 ･ <b>31–60</b>: Умеренный уровень озона. Риск для здоровья мал, но чувствительные группы могут испытывать дискомфорт.
 ･ <b>61–100</b>: Высокий уровень озона. Могут возникнуть проблемы с дыханием у чувствительных групп населения.
 ･ <b>101–150</b>: Очень высокий уровень озона. Необходимо избегать продолжительного пребывания на улице для чувствительных людей.
-･ <b>151+</b>: Опасный уровень озона. Рекомендуется минимизировать время на улице и избегать физических нагрузок.
+･ <b>151+</b>: Опасный уровень озона. Рекомендуется минимизировать время на улице и избегать физических нагрузок."""
+        if not pollution:
+            pollution = 'ozone'
 
-
+    elif pollution == 'sulfur':
+        info = """
 <i>Шкала концентрации диоксида серы варьируется от <b>0</b> до <b>500</b> µг/м³:</i>
 
 ･ <b>0–50</b>: Низкий уровень диоксида серы. Воздух безопасен для большинства людей.
@@ -128,8 +121,10 @@ async def pollution_standards(callback_query: types.CallbackQuery):
 ･ <b>101–150</b>: Высокий уровень диоксида серы. Рекомендуется ограничить время на улице для чувствительных групп населения.
 ･ <b>151–200</b>: Очень высокий уровень диоксида серы. Риск для здоровья возрастает, необходимо ограничить физическую активность на улице.
 ･ <b>201+</b>: Опасный уровень диоксида серы. Рекомендуется избегать выхода на улицу и длительных физических нагрузок.
+"""
 
-
+    elif pollution == 'nitrogen':
+        info = """
 <i>Шкала концентрации диоксида азота варьируется от <b>0</b> до <b>200</b> µг/м³:</i>
 
 ･ <b>0–40</b>: Низкий уровень диоксида азота. Воздух безопасен для большинства людей.
@@ -137,8 +132,10 @@ async def pollution_standards(callback_query: types.CallbackQuery):
 ･ <b>81–120</b>: Высокий уровень диоксида азота. Могут возникнуть проблемы с дыханием у чувствительных групп населения.
 ･ <b>121–160</b>: Очень высокий уровень диоксида азота. Необходимо избегать продолжительного пребывания на улице для чувствительных людей.
 ･ <b>161+</b>: Опасный уровень диоксида азота. Рекомендуется минимизировать время на улице и избегать физических нагрузок.
+"""
 
-
+    elif pollution == 'carbon':
+        info = """
 <i>Шкала концентрации угарного газа варьируется от <b>0</b> до <b>1000</b> µг/м³:</i>
 
 ･ <b>0–50</b>: Низкий уровень угарного газа. Воздух безопасен для большинства людей.
@@ -146,8 +143,14 @@ async def pollution_standards(callback_query: types.CallbackQuery):
 ･ <b>101–200</b>: Высокий уровень угарного газа. Рекомендуется ограничить время на улице для чувствительных групп населения.
 ･ <b>201–300</b>: Очень высокий уровень угарного газа. Риск для здоровья возрастает, необходимо ограничить физическую активность на улице.
 ･ <b>301+</b>: Опасный уровень угарного газа. Рекомендуется избегать выхода на улицу и длительных физических нагрузок.
-""",
-            reply_markup=InlineKeyboards.back_keyboard(),
+"""
+
+    try:
+        await bot.edit_message_text(
+            chat_id=callback_query.message.chat.id,
+            message_id=callback_query.message.message_id,
+            text=info,
+            reply_markup=InlineKeyboards.back_keyboard_from_concentrations(pol_st=pollution),
             parse_mode='HTML'
         )
     except MessageNotModified:
@@ -160,5 +163,4 @@ def register_other_handlers(dispatcher: Dispatcher):
     dispatcher.register_callback_query_handler(back, lambda cb: cb.data == 'back')
     dispatcher.register_callback_query_handler(uv_index, lambda cb: cb.data == 'uv_index')
     dispatcher.register_callback_query_handler(air_quality_index, lambda cb: cb.data == 'aqi_index')
-    dispatcher.register_callback_query_handler(pollution_standards, lambda cb: cb.data == 'pollution_standards')
-    dispatcher.register_callback_query_handler(transition_to_change_city2, lambda cb: cb.data == 'next_cities')
+    dispatcher.register_callback_query_handler(pollution_standards, lambda cb: cb.data.startswith('pollution_standard'))

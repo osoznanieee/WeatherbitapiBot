@@ -4,6 +4,7 @@ from pydantic import (
     BaseModel, Field, conint
 )
 
+from datetime import datetime
 PollenLevelType = conint(ge=0, le=4)
 
 
@@ -24,6 +25,7 @@ class WeatherSchemeData(ConfigMixin):
     temp: float = Field(description='Температура')
     app_temp: float = Field(description='Кажущаяся/"ощущаемая как" температура')
 
+    ob_time: datetime = Field(description='Время наблюдения', default=0)
     datetime: str
 
     pop: int = Field(description='Вероятность выпадение осадков (%)', default=0)
