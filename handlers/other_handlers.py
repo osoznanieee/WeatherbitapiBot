@@ -28,19 +28,7 @@ async def dev(callback_query: types.CallbackQuery):
             parse_mode="HTML"
         )
     except MessageNotModified:
-        await callback_query.answer('Вы уже нажали на кнопку')
-
-
-async def back(callback_query: types.CallbackQuery):
-    try:
-        await bot.edit_message_text(
-            chat_id=callback_query.message.chat.id,
-            message_id=callback_query.message.message_id,
-            text='Другое:',
-            reply_markup=InlineKeyboards.other_keyboard()
-        )
-    except MessageNotModified:
-        await callback_query.answer('Вы уже нажали на кнопку Назад')
+        await callback_query.answer('Вы уже нажали на кнопку Связь')
 
 
 async def uv_index(callback_query: types.CallbackQuery):
@@ -53,8 +41,8 @@ async def uv_index(callback_query: types.CallbackQuery):
 Индекс помогает людям оценить, насколько сильное УФ-излучение в определенный день, 
 и насколько велика вероятность повреждения кожи или глаз от солнечных лучей.
 
-<i>Шкала УФ-индекса варьируется от <b>0</b> до <b>11+</b>:</i>
 
+<i>Шкала УФ-индекса варьируется от <b>0</b> до <b>11+</b>:</i>
 
 ･ <b>0–2</b>: Низкий риск. Можно находиться на солнце без особой защиты.
 ･ <b>3–5</b>: Умеренный риск. Рекомендуется использовать солнцезащитные средства.
@@ -66,7 +54,7 @@ async def uv_index(callback_query: types.CallbackQuery):
             parse_mode='HTML'
         )
     except MessageNotModified:
-        await callback_query.answer('Вы уже нажали на кнопку')
+        await callback_query.answer('Вы уже нажали на кнопку УФ-Индекс')
 
 
 async def air_quality_index(callback_query: types.CallbackQuery):
@@ -92,7 +80,7 @@ async def air_quality_index(callback_query: types.CallbackQuery):
             parse_mode='HTML'
         )
     except MessageNotModified:
-        await callback_query.answer('Вы уже нажали на кнопку')
+        await callback_query.answer('Вы уже нажали на кнопку Индекс качества воздуха')
 
 
 async def pollution_standards(callback_query: types.CallbackQuery):
@@ -100,7 +88,7 @@ async def pollution_standards(callback_query: types.CallbackQuery):
     pollution = callback_query.data[20:]
     info = None
 
-    if pollution == 'ozone' or callback_query.data == 'pollution_standards':
+    if pollution == 'ozone':
         info = """
 <i>Шкала концентрации озона варьируется от <b>0</b> до <b>180</b> µг/м³:</i>
 
@@ -108,9 +96,8 @@ async def pollution_standards(callback_query: types.CallbackQuery):
 ･ <b>31–60</b>: Умеренный уровень озона. Риск для здоровья мал, но чувствительные группы могут испытывать дискомфорт.
 ･ <b>61–100</b>: Высокий уровень озона. Могут возникнуть проблемы с дыханием у чувствительных групп населения.
 ･ <b>101–150</b>: Очень высокий уровень озона. Необходимо избегать продолжительного пребывания на улице для чувствительных людей.
-･ <b>151+</b>: Опасный уровень озона. Рекомендуется минимизировать время на улице и избегать физических нагрузок."""
-        if not pollution:
-            pollution = 'ozone'
+･ <b>151+</b>: Опасный уровень озона. Рекомендуется минимизировать время на улице и избегать физических нагрузок.
+"""
 
     elif pollution == 'sulfur':
         info = """
@@ -154,13 +141,12 @@ async def pollution_standards(callback_query: types.CallbackQuery):
             parse_mode='HTML'
         )
     except MessageNotModified:
-        await callback_query.answer('Вы уже нажали на кнопку')
+        await callback_query.answer('Вы уже нажали на кнопку Нормы загрязняющих веществ')
 
 
 def register_other_handlers(dispatcher: Dispatcher):
     dispatcher.register_callback_query_handler(other, lambda cb: cb.data == 'other')
     dispatcher.register_callback_query_handler(dev, lambda cb: cb.data == 'dev')
-    dispatcher.register_callback_query_handler(back, lambda cb: cb.data == 'back')
     dispatcher.register_callback_query_handler(uv_index, lambda cb: cb.data == 'uv_index')
     dispatcher.register_callback_query_handler(air_quality_index, lambda cb: cb.data == 'aqi_index')
     dispatcher.register_callback_query_handler(pollution_standards, lambda cb: cb.data.startswith('pollution_standard'))

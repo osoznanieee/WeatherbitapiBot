@@ -7,4 +7,4 @@ from config import config
 API_TOKEN = config.TOKEN
 
 bot = Bot(token=API_TOKEN)  # используется для взаимодействия с Telegram API
-dp = Dispatcher(bot)  # управляет обработкой входящих обновлений
+dp = Dispatcher(bot=bot)  # управляет обработкой входящих обновлений

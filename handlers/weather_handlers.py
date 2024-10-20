@@ -70,7 +70,7 @@ async def get_1_day_forecast(callback_query: types.CallbackQuery):
                     message_id=callback_query.message.message_id,
                     text=user.weather_forecast_for_1_day,
                     reply_markup=InlineKeyboards.change_days_forecasts_keyboard(**data),
-                    parse_mode='HTML'
+                    parse_mode='MarkdownV2'
                 )
             except MessageNotModified:
                 await callback_query.answer('Вы уже нажали на кнопку')
@@ -103,61 +103,67 @@ async def get_1_day_forecast(callback_query: types.CallbackQuery):
                 lst = [sorted(sublist, key=lambda x: x[1], reverse=True) for sublist in lst]
 
                 text_weather = f"""
-<u><b>Число - {day[0].datetime[:10]}</b></u> 📆
+>~~*Число — {day[0].datetime[:10]}*~~
 
 
-<i><b>Ночь (с 00 по {day[0].datetime[-2:]})</b></i> 🌙
-Направление ветра - {day[0].wind_cdir_full} 💨
-<b>Температура: {round(day[0].temp, 1)}°C 🌡
-Кажущаяся температура: {round(day[0].app_temp, 1)}°C 🌡</b>
-Вероятность выпадения осадков - {day[0].pop}%
+_*Ночь (с 00 по {day[0].datetime[-2:]})*_ 🌙
+>*Температура: {round(day[0].temp, 1)}°C 🌡
+>Кажущаяся температура: {round(day[0].app_temp, 1)}°C 🌡
+>Вероятность выпадения осадков - {day[0].pop}%
+>Направление ветра - {wcf.replace('-', ' — ', 1) if (wcf := day[0].wind_cdir_full).count('-') >= 2 else wcf} 💨*
 Давление - {round(day[0].pres * 0.75006)} мм рт. ст.
 Относительная влажность воздуха - {day[0].rh}%
 Облачность - {day[0].clouds}% ☁️
 УФ-индекс - {day[0].uv}
-<b>Статус погоды: 
-{lst[0][0][0]} - {round(lst[0][0][1] * (100 / 6))}%
-{f'{lst[0][1][0]} - {round(lst[0][1][1] * (100 / 6))}%{newline}' if len(lst[0]) > 1 else ''}</b>
+>_*Статус погоды: 
+>{lst[0][0][0]} - {round(lst[0][0][1] * (100 / 6))}%*_ 
+{f'>_*{lst[0][1][0]} - {round(lst[0][1][1] * (100 / 6))}%*_{newline}' if len(lst[0]) > 1 else ''}
 
-<i><b>Утро (с 06 по {day[1].datetime[-2:]})</b></i> 🌅
-Направление ветра - {day[1].wind_cdir_full} 💨
-<b>Температура: {round(day[1].temp, 1)}°C 🌡
-Кажущаяся температура: {round(day[1].app_temp, 1)}°C 🌡</b>
-Вероятность выпадения осадков - {day[1].pop}%
+
+
+_*Утро (с 06 по {day[1].datetime[-2:]})*_ 🌅
+>*Температура: {round(day[1].temp, 1)}°C 🌡
+>Кажущаяся температура: {round(day[1].app_temp, 1)}°C 🌡
+>Вероятность выпадения осадков - {day[1].pop}%
+>Направление ветра - {wcf.replace('-', ' — ', 1) if (wcf := day[1].wind_cdir_full).count('-') >= 2 else wcf} 💨*
 Давление - {round(day[1].pres * 0.75006)} мм рт. ст.
 Относительная влажность воздуха - {day[1].rh}%
 Облачность - {day[1].clouds}% ☁️
 УФ-индекс - {day[1].uv}
-<b>Статус погоды: 
-{lst[1][0][0]} - {round(lst[1][0][1] * (100 / 6))}%
-{f'{lst[1][1][0]} - {round(lst[1][1][1] * (100 / 6))}%{newline}' if len(lst[1]) > 1 else ''}</b>
+>_*Статус погоды: 
+>{lst[1][0][0]} - {round(lst[1][0][1] * (100 / 6))}%*_
+{f'>_*{lst[1][1][0]} - {round(lst[1][1][1] * (100 / 6))}*_%{newline}' if len(lst[1]) > 1 else ''}
 
-<i><b>День (с 12 по {day[2].datetime[-2:]})</b></i> 🌞
-Направление ветра - {day[2].wind_cdir_full} 💨
-<b>Температура: {round(day[2].temp, 1)}°C 🌡
-Кажущаяся температура: {round(day[2].app_temp, 1)}°C 🌡</b>
-Вероятность выпадения осадков - {day[2].pop}%
+
+
+_*День (с 12 по {day[2].datetime[-2:]})*_ 🌞
+>*Температура: {round(day[2].temp, 1)}°C 🌡
+>Кажущаяся температура: {round(day[2].app_temp, 1)}°C 🌡
+>Вероятность выпадения осадков - {day[2].pop}%
+>Направление ветра - {wcf.replace('-', ' — ', 1) if (wcf := day[2].wind_cdir_full).count('-') >= 2 else wcf} 💨*
 Давление - {round(day[2].pres * 0.75006)} мм рт. ст.
 Относительная влажность воздуха - {day[2].rh}%
 Облачность - {day[2].clouds}% ☁️
 УФ-индекс - {day[2].uv}
-<b>Статус погоды: 
-{lst[2][0][0]} - {round(lst[2][0][1] * (100 / 6))}%
-{f'{lst[2][1][0]} - {round(lst[2][1][1] * (100 / 6))}%{newline}' if len(lst[2]) > 1 else ''}</b>
+>_*Статус погоды: 
+>{lst[2][0][0]} - {round(lst[2][0][1] * (100 / 6))}%*_
+{f'>_*{lst[2][1][0]} - {round(lst[2][1][1] * (100 / 6))}%*_{newline}' if len(lst[2]) > 1 else ''}
 
-<i><b>Вечер (с 18 по {day[3].datetime[-2:]})</b></i> 🌆
-Направление ветра - {day[3].wind_cdir_full} 💨
-<b>Температура: {round(day[3].temp, 1)}°C 🌡
-Кажущаяся температура: {round(day[3].app_temp, 1)}°C 🌡</b>
-Вероятность выпадения осадков - {day[3].pop}%
+
+
+_*Вечер (с 18 по {day[3].datetime[-2:]})*_ 🌆
+>*Температура: {round(day[3].temp, 1)}°C 🌡
+>Кажущаяся температура: {round(day[3].app_temp, 1)}°C 🌡
+>Вероятность выпадения осадков - {day[3].pop}%
+>Направление ветра - {wcf.replace('-', ' — ', 1) if (wcf := day[3].wind_cdir_full).count('-') >= 2 else wcf} 💨*
 Давление - {round(day[3].pres * 0.75006)} мм рт. ст.
 Относительная влажность воздуха - {day[3].rh}%
 Облачность - {day[3].clouds}% ☁️
 УФ-индекс - {day[3].uv}
-<b>Статус погоды: 
-{lst[3][0][0]} - {round(lst[3][0][1] * (100 / 6))}%
-{f'{lst[3][1][0]} - {round(lst[3][1][1] * (100 / 6))}%' if len(lst[3]) > 1 else ''}</b>""" \
-                    .replace('\n\n', '\n').replace('\n', '\n\n', 2)
+>_*Статус погоды: 
+>{lst[3][0][0]} - {round(lst[3][0][1] * (100 / 6))}%*_
+{f'>_*{lst[3][1][0]} - {round(lst[3][1][1] * (100 / 6))}%*_' if len(lst[3]) > 1 else ''}""" \
+                    .replace('\n\n', '\n').replace('\n', '\n\n', 2).replace('-', '\\-').replace('.', '\\.').replace('(', '\\(').replace(')', '\\)')
 
                 if not days:
                     try:
@@ -166,7 +172,7 @@ async def get_1_day_forecast(callback_query: types.CallbackQuery):
                             message_id=callback_query.message.message_id,
                             text=text_weather,
                             reply_markup=InlineKeyboards.change_days_forecasts_keyboard(**data),
-                            parse_mode="HTML"
+                            parse_mode="MarkdownV2"
                         )
                     except MessageNotModified:
                         await callback_query.answer('Вы уже нажали на кнопку')
@@ -241,7 +247,7 @@ async def get_7_days_forecasts(callback_query: types.CallbackQuery):
                     message_id=callback_query.message.message_id,
                     text=getattr(user, f'weather_forecast_for_{day}_day'),
                     reply_markup=InlineKeyboards.change_days_forecasts_keyboard(**data),
-                    parse_mode='HTML'
+                    parse_mode='MarkdownV2'
                 )
             except MessageNotModified:
                 await callback_query.answer('Вы уже нажали на кнопку')
@@ -274,7 +280,7 @@ async def get_today_forecast(callback_query: types.CallbackQuery):
                     message_id=callback_query.message.message_id,
                     text=user.weather_info_today,
                     reply_markup=InlineKeyboards.transition_to_main_keyboard(),
-                    parse_mode='HTML'
+                    parse_mode='MarkdownV2'
                 )
             except MessageNotModified:
                 await callback_query.answer('Вы уже нажали на кнопку')
@@ -297,37 +303,45 @@ async def get_today_forecast(callback_query: types.CallbackQuery):
 
                     data: WeatherSchemeDataToday = handler.parse_json_forecasts_for_today(json)
 
+                    nl = '\n'
+
+                    time_now = datetime.now()
+
+                    if time_now.hour in (0, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 24):
+                        hour = 'часов'
+                    elif time_now.hour in (2, 3, 4, 22, 23):
+                        hour = 'часа'
+                    else:
+                        hour = 'час'
+
                     text = f"""
-<i><b>Текущая дата - {datetime.now().strftime("%Y-%m-%d  %H")} часов</b></i> 📆
-Время обновления прогноза - {(data.ob_time + timedelta(hours=3)).strftime("%Y-%m-%d  %H:%M")}
+>*Текущая дата — {time_now.strftime("%Y-%m-%d  ")}{time_now.hour} {hour}*
+
+>*Скорость ветра - {data.wind_spd} м/с 💨 * {f'{nl}>Скорость порыва ветра - {data.gust} м/с' if data.gust else ''} 
+>Направление ветра - {wcf.replace('-', ' — ', 1) if (wcf := data.wind_cdir_full).count('-') >= 2 else wcf}
+>*Температура: {data.temp}°C 🌡
+>Кажущаяся температура: {data.app_temp}°C 🌡*
 
 Время восхода солнца - {(datetime.strptime(data.sunrise, "%H:%M") + timedelta(hours=3)).strftime("%H:%M")} 🌇
 Время заката - {(datetime.strptime(data.sunset, "%H:%M") + timedelta(hours=3)).strftime("%H:%M")} 🏙
 
-Давление - {round(data.pres * 0.75006)}
-
-<b>Скорость ветра - {data.wind_spd} м/с 💨 </b>
-{f'Скорость порыва ветра - {data.gust} м/с' if data.gust else ''} 
-Направление ветра - {data.wind_cdir_full}
-
-<b>Температура: {data.temp}°C 🌡
-Кажущаяся температура: {data.app_temp}°C</b> 🌡
-
-Относительная влажность воздуха - {data.rh} % 💧
+Давление - {round(data.pres * 0.75006)} мм рт. ст.
+Относит. влажность воздуха - {data.rh} % 💧
 Облачность - {data.clouds} % ☁️
 Видимость - {data.vis} км 👁
 УФ-индекс - {data.uv}
 Индекс качества воздуха - {data.aqi}
 
+||Время обновления прогноза: {(data.ob_time + timedelta(hours=3)).strftime("%Y-%m-%d  %H:%M")}||
 
-<b>Статус: {data.weather.description}</b>"""
+>_*Статус: {data.weather.description}*_""".replace('-', '\\-').replace('.', '\\.')
 
                     await bot.edit_message_text(
                         chat_id=callback_query.message.chat.id,
                         message_id=callback_query.message.message_id,
                         text=text,
                         reply_markup=InlineKeyboards.transition_to_main_keyboard(),
-                        parse_mode='HTML'
+                        parse_mode='MarkdownV2'
                     )
                 except MessageNotModified:
                     await callback_query.answer('Что-то пошло не так!')
@@ -346,14 +360,14 @@ async def get_today_air_quality_forecast(callback_query: types.CallbackQuery):
     else:
         is_updated_now = user.air_quality_update_on.strftime("%Y-%m-%d") == datetime.now().strftime("%Y-%m-%d")
 
-        if is_updated_now and user.weather_info_today:
+        if is_updated_now and user.air_quality_today:
             try:
                 await bot.edit_message_text(
                     chat_id=callback_query.message.chat.id,
                     message_id=callback_query.message.message_id,
                     text=user.air_quality_today,
                     reply_markup=InlineKeyboards.transition_to_main_keyboard(),
-                    parse_mode='HTML'
+                    parse_mode='MarkdownV2'
                 )
             except MessageNotModified:
                 await callback_query.answer('Вы уже нажали на кнопку')
@@ -385,34 +399,31 @@ async def get_today_air_quality_forecast(callback_query: types.CallbackQuery):
                     }
 
                     text = f"""
-<i><b>Дата - {datetime.now().strftime("%Y-%m-%d")}</b></i> 🕒
+>*Дата — {datetime.now().strftime("%Y-%m-%d")}*
 
-Индекс качества воздуха: {data.aqi} 🌬️
+>_*Индекс качества воздуха*_: *{data.aqi}* 
+>_*Преобладающий тип пыльцы*_ - *{predominant_pollens[data.predominant_pollen_type]}*
 
+*Концентрация озона* (O3) на поверхности - *{round(data.o3, 1)} (µг/м³)* 🌫️
 
-<b>Концентрация озона</b> (O3) на поверхности - {round(data.o3, 1)} (µг/м³) 🌫️
+*Концентрация диоксида серы* (SO2) на поверхности - *{round(data.so2, 1)} (µг/м³)* 🏭
 
-<b>Концентрация диоксида серы</b> (SO2) на поверхности - {round(data.so2, 1)} (µг/м³) 🏭
+*Концентрация диоксида азота* (NO2) на поверхности - *{round(data.no2, 1)} (µг/м³)* 🚗💨 _*(Иногда неточный прогноз)*_
 
-<b>Концентрация диоксида азота</b> (NO2) на поверхности - {round(data.no2, 1)} (µг/м³) 🚗 <b><i>(Иногда неточный прогноз)</i></b>
+*Концентрация угарного газа* (CO) - *{round(data.co, 1)} (µг/м³)* 🔥 _*(Иногда неточный прогноз)*_
 
-<b>Концентрация угарного газа (CO)</b> - {round(data.co, 1)} (µг/м³) 🔥 <b><i>(Иногда неточный прогноз)</i></b>
+>Уровень пыльцы деревьев - {levels[data.pollen_level_tree]} 🌳
+>Уровень пыльцы трав - {levels[data.pollen_level_grass]} 🌿
+>Уровень пыльцы сорняков - {levels[data.pollen_level_weed]} 🌾
+>Уровень плесени - {levels[data.mold_level]} 🦠
+""".replace('-', '\\-').replace('.', '\\.').replace('(', '\\(').replace(')', '\\)')
 
-
-<b>Уровень пыльцы деревьев - {levels[data.pollen_level_tree]}</b> 🌳
-<b>Уровень пыльцы трав - {levels[data.pollen_level_grass]}</b> 🌿
-<b>Уровень пыльцы сорняков - {levels[data.pollen_level_weed]}</b> 🌾
-<b>Уровень плесени - {levels[data.mold_level]}</b> 🦠
-
-
-<i>Преобладающий тип пыльцы</i> - {predominant_pollens[data.predominant_pollen_type]}
-"""
                     await bot.edit_message_text(
                         chat_id=callback_query.message.chat.id,
                         message_id=callback_query.message.message_id,
                         text=text,
                         reply_markup=InlineKeyboards.transition_to_main_keyboard(),
-                        parse_mode='HTML'
+                        parse_mode='MarkdownV2'
                     )
                 except MessageNotModified:
                     await callback_query.answer('Что-то пошло не так!')

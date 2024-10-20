@@ -18,7 +18,7 @@ class InlineKeyboards:
                  InlineKeyboardButton(text='Выбрать город 🗺️', callback_data='change_city')],
                 [InlineKeyboardButton(text='Текущие погодные условия 🌥️', callback_data='forecast_for_today')],
                 [InlineKeyboardButton(text='Прогноз на следующие 7 дней 🌥️', callback_data='1_day')],
-                [InlineKeyboardButton(text='Качество воздуха на сегодня 🌬️', callback_data='air_quality')],
+                [InlineKeyboardButton(text='Качество воздуха на сегодня 💨', callback_data='air_quality')],
                 [InlineKeyboardButton(text='Другое', callback_data='other')]
             ], row_width=2)
         return kb
@@ -185,9 +185,9 @@ class InlineKeyboards:
         kb = InlineKeyboardMarkup(
             inline_keyboard=[
                 [InlineKeyboardButton(text='Связь 📞', callback_data='dev')],
-                [InlineKeyboardButton(text='УФ-Индекс', callback_data='uv_index')],
-                [InlineKeyboardButton(text='Индекс качества воздуха', callback_data='aqi_index')],
-                [InlineKeyboardButton(text='Нормы концетрации веществ', callback_data='pollution_standards')],
+                [InlineKeyboardButton(text='УФ-Индекс ☀️', callback_data='uv_index')],
+                [InlineKeyboardButton(text='Индекс качества воздуха 💨', callback_data='aqi_index')],
+                [InlineKeyboardButton(text='Нормы концетрации веществ 📊', callback_data='pollution_standards_ozone')],
                 [InlineKeyboardButton(text='В главное меню', callback_data='main_menu')]
             ], row_width=1)
         return kb
@@ -197,7 +197,7 @@ class InlineKeyboards:
         """Инлайн клавиатура чтобы вернутся в меню 'Другое'"""
         kb = InlineKeyboardMarkup(
             inline_keyboard=[
-                [InlineKeyboardButton(text='Назад', callback_data='back')]
+                [InlineKeyboardButton(text='Назад', callback_data='other')]
             ], row_width=1)
         return kb
 
@@ -215,6 +215,6 @@ class InlineKeyboards:
                                     callback_data='pollution_standards_nitrogen')) if pol_st != 'nitrogen' else ...
         kb.add(InlineKeyboardButton(text='Концентрация угарного газа 🔥',
                                     callback_data='pollution_standards_carbon')) if pol_st != 'carbon' else ...
-        kb.add(InlineKeyboardButton(text='Назад', callback_data='back'))
+        kb.add(InlineKeyboardButton(text='Назад', callback_data='other'))
 
         return kb

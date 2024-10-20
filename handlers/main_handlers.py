@@ -35,7 +35,7 @@ async def profile(callback_query: types.CallbackQuery):
                                     reply_markup=InlineKeyboards.transition_to_main_keyboard(),
                                     parse_mode="HTML")
     except MessageNotModified:
-        await callback_query.answer('Вы уже нажали на кнопку Профиль')
+        await callback_query.answer('Вы уже нажали на кнопку Профиль', show_alert=True)
 
 
 async def return_to_main_menu(callback_query: types.CallbackQuery):
@@ -47,7 +47,7 @@ async def return_to_main_menu(callback_query: types.CallbackQuery):
             reply_markup=InlineKeyboards.main_keyboard()
         )
     except MessageNotModified:
-        await callback_query.answer('Вы уже нажали на кнопку В главное меню')
+        await callback_query.answer('Вы уже нажали на кнопку В главное меню', show_alert=True)
 
 
 async def transition_to_change_city(callback_query: types.CallbackQuery):
@@ -60,7 +60,7 @@ async def transition_to_change_city(callback_query: types.CallbackQuery):
             reply_markup=InlineKeyboards.first_30_cities_keyboard()
         )
     except MessageNotModified:
-        await callback_query.answer('Вы уже нажали на кнопку')
+        await callback_query.answer('Вы уже нажали на кнопку', show_alert=True)
 
 
 async def change_city(callback_query: types.CallbackQuery):
@@ -78,7 +78,7 @@ async def change_city(callback_query: types.CallbackQuery):
         if not result:
             await db.insert_user(user_id=callback_query.from_user.id, city=city)
     except Exception as exc:
-        await callback_query.answer(f'Что-то пошло не так: {exc}')
+        await callback_query.answer(f'Что-то пошло не так: {exc}', show_alert=True)
 
     else:
         try:
@@ -90,7 +90,7 @@ async def change_city(callback_query: types.CallbackQuery):
             )
             await callback_query.answer('Город успешно установлен')
         except MessageNotModified:
-            await callback_query.answer('Вы уже нажали на кнопку В главное меню')
+            await callback_query.answer('Вы уже нажали на кнопку', show_alert=True)
 
 
 async def transition_to_change_city2(callback_query: types.CallbackQuery):
@@ -101,11 +101,11 @@ async def transition_to_change_city2(callback_query: types.CallbackQuery):
             reply_markup=InlineKeyboards.second_20_cities_keyboard()
         )
     except MessageNotModified:
-        await callback_query.answer('Вы уже нажали на кнопку')
+        await callback_query.answer('Вы уже нажали на кнопку', show_alert=True)
 
 
 def register_main_handlers(dispatcher: Dispatcher):
-    dispatcher.register_message_handler(start_command_handler, commands=['start'])
+    dispatcher.register_message_handler(start_command_handler, commands='start')
     dispatcher.register_callback_query_handler(profile, lambda cb: cb.data == 'profile')
     dispatcher.register_callback_query_handler(return_to_main_menu, lambda cb: cb.data == 'main_menu')
     dispatcher.register_callback_query_handler(transition_to_change_city, lambda cb: cb.data == 'change_city')
