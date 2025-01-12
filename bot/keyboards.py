@@ -187,7 +187,7 @@ class InlineKeyboards:
                 [InlineKeyboardButton(text='Связь 📞', callback_data='dev')],
                 [InlineKeyboardButton(text='УФ-Индекс ☀️', callback_data='uv_index')],
                 [InlineKeyboardButton(text='Индекс качества воздуха 💨', callback_data='aqi_index')],
-                [InlineKeyboardButton(text='Нормы концетрации веществ 📊', callback_data='pollution_standards_ozone')],
+                [InlineKeyboardButton(text='Нормы концентрации веществ 📊', callback_data='pollution_standards_ozone')],
                 [InlineKeyboardButton(text='В главное меню', callback_data='main_menu')]
             ], row_width=1)
         return kb
@@ -204,7 +204,7 @@ class InlineKeyboards:
     @staticmethod
     def back_keyboard_from_concentrations(pol_st: Literal['ozone', 'sulfur', 'nitrogen', 'carbon']) \
             -> InlineKeyboardMarkup:
-        """Инлайн клавиатура чтобы вернутся в меню 'Другое' с раздела где нормы концетрации веществ"""
+        """Инлайн клавиатура чтобы вернутся в меню 'Другое' с раздела, где нормы концентрации веществ"""
 
         kb = InlineKeyboardMarkup(row_width=1)
         kb.add(InlineKeyboardButton(text='Концентрации озона 🌫️',

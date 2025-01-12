@@ -43,7 +43,7 @@ class Database:
                     action: Literal['create', 'drop'],
                     metadata: MetaData = Base.metadata
                     ) -> None:
-        """Действия с таблицами (создать или удалить)"""
+        """Действия с таблицами (создать или удалить) (хз зачем сделал)"""
         async with self.async_engine.connect() as conn:
             if action == 'create':
                 if not self.__is_exists_tables:
@@ -167,7 +167,7 @@ class Database:
                                                     day6: str,
                                                     day7: str
                                                     ) -> Optional[int]:
-        """Обновить прогнозы на 3 дня по городу"""
+        """Обновить прогнозы на 7 дней по городу"""
         async with self.async_session() as session:
             stmt = (
                 update(CitiesORM).
@@ -218,7 +218,7 @@ class Database:
     async def update_air_quality_info_today_by_city(self, city: str,
                                                     new_air_quality_info_today: str
                                                     ) -> Optional[int]:
-        """Обновить прогнозы на сегодня по городу"""
+        """Обновить прогнозы качества воздуха на сегодня по городу"""
         async with self.async_session() as session:
             stmt = (
                 update(CitiesORM).
@@ -241,7 +241,7 @@ class Database:
     async def execute_commands(self, sql_commands: list[str]):
         """
         Срабатывает при флагах -a и -d.
-        Исполняет SQL команды
+        Удаляет таблицы или их создает
         """
         async with self.async_engine.begin() as connection:  # Открываем транзакцию
             for command in sql_commands:

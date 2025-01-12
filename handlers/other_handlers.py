@@ -23,7 +23,7 @@ async def dev(callback_query: types.CallbackQuery):
         await bot.edit_message_text(
             chat_id=callback_query.message.chat.id,
             message_id=callback_query.message.message_id,
-            text='Создатель: <a href="tg://user?id=6858797803">клик</a>',
+            text='Создатель: <a href="tg://user?id=6702102308">клик</a>',
             reply_markup=InlineKeyboards.back_keyboard(),
             parse_mode="HTML"
         )
